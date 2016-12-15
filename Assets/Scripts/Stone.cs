@@ -57,8 +57,8 @@ public class Stone : MonoBehaviour {
                 tangDistance = Mathf.Abs(tangDistance);
                 collided = true;
                 otherStone.collided = true;
-                otherStone.rb.velocity = otherVector.normalized * rb.velocity.magnitude * (1 - tangDistance / 0.3f);
-                rb.velocity = shooterVector.normalized * rb.velocity.magnitude * (tangDistance / 0.3f);
+                otherStone.rb.velocity = otherVector.normalized * rb.velocity.magnitude * (1 - tangDistance / 0.31f);
+                rb.velocity = shooterVector.normalized * rb.velocity.magnitude * (tangDistance / 0.31f);
 
                 otherStone.lastHit = Time.time;
                 lastHit = Time.time;
