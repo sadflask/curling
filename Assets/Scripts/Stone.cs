@@ -35,7 +35,7 @@ public class Stone : MonoBehaviour {
             //CHANGE CAMERA
             endCam.enabled = false;
             topCam.enabled = true;
-            canvas.worldCamera = Camera.current;
+            canvas.worldCamera = topCam;
         } else if (other.CompareTag("Stone")) {
             Stone otherStone = other.gameObject.GetComponent<Stone>();
             //Set angle of self and other

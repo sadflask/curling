@@ -15,10 +15,10 @@ public class GameController : MonoBehaviour {
     public Canvas typeCanvas;
     public Image[] blueIcons, redIcons;
     public Text scoreText, endText;
-    public float nextWeight, nextDirection;
+    public float weight, direction;
     public string type;
     public Stone stone = null;
-    public int nextHandle;
+    public int handle;
 
     void Start()
     {
@@ -37,9 +37,9 @@ public class GameController : MonoBehaviour {
             toThrow = red;
         }
         stone = Instantiate(toThrow).GetComponent<Stone>();
-        stone.force = nextWeight;
-        stone.transform.rotation = Quaternion.Euler(0.0f, nextDirection, 0.0f);
-        stone.handle = nextHandle;
+        stone.force = weight;
+        stone.transform.rotation = Quaternion.Euler(0.0f, direction, 0.0f);
+        stone.handle = handle;
         stone.color = throwingTeam;
         stones[stonesThrown] = stone;
         stone.endCam = endCam;
@@ -48,8 +48,7 @@ public class GameController : MonoBehaviour {
 
         endCam.enabled = true;
         topCam.enabled = false;
-        scoreCanvas.worldCamera = Camera.current;
-        nextWeight = 0.0f;
+        scoreCanvas.worldCamera = endCam;
         return stone;
         
     }
@@ -66,8 +65,8 @@ public class GameController : MonoBehaviour {
 
                     //Open the throw dialog
                     typeCanvas.gameObject.SetActive(true);
-                    endCam.enabled = true;
-                    topCam.enabled = false;
+                    topCam.enabled = true;
+                    endCam.enabled = false;
 
                     //Wait until the user throws the stone
                     while (stone == null)
@@ -96,8 +95,8 @@ public class GameController : MonoBehaviour {
 
                     //Open the throw dialog
                     typeCanvas.gameObject.SetActive(true);
-                    endCam.enabled = true;
-                    topCam.enabled = false;
+                    topCam.enabled = true;
+                    endCam.enabled = false;
 
                     //Wait until the user throws the stone
                     while (stone == null)
@@ -121,7 +120,7 @@ public class GameController : MonoBehaviour {
                 }
             }
 
-            yield return new WaitForSeconds(10);
+            yield return new WaitForSeconds(2);
             
             //Calculate who scored
             Score.score(GetComponent<GameController>());
@@ -157,4 +156,3 @@ public class GameController : MonoBehaviour {
     }
 
 }
-

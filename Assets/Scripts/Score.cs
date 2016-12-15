@@ -13,7 +13,7 @@ public class Score {
         float minBlue = sc.findMinimumBlue(gc.stones);
         if (minRed < minBlue)
         {
-            if (minRed > 190)
+            if (minRed > 1.90)
             {
                 score = 0;
             }
@@ -28,7 +28,7 @@ public class Score {
         }
         else
         {
-            if (minBlue > 190)
+            if (minBlue > 1.90)
             {
                 score = 0;
             }
@@ -52,7 +52,7 @@ public class Score {
         {
             if (s.color == "red")
             {
-                float distance = (s.transform.position - new Vector3(0, 0.3f, 39.62f)).magnitude;
+                float distance = (s.transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude;
                 if (distance < min)
                 {
                     min = distance;
@@ -69,7 +69,7 @@ public class Score {
         {
             if (s.color == "blue")
             {
-                float distance = (s.transform.position - new Vector3(0, 0.3f, 39.62f)).magnitude;
+                float distance = (s.transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude;
                 if (distance < min)
                 {
                     min = distance;
@@ -85,13 +85,18 @@ public class Score {
         int score = 0;
         foreach (Stone s in stones)
         {
-            float distance = (s.transform.position - new Vector3(0, 0.3f, 39.62f)).magnitude;
-            if (distance < minDist)
+            
+            float distance = (s.transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude;
+            
+            if (distance < minDist && distance < 1.9)
             {
                 score++;
+                Debug.Log(string.Format("Stone is at: {0}", s.transform.position));
+                Debug.Log(string.Format("Distance = {0}, Min Distance = {1}", distance, minDist));
             }
 
         }
+        Debug.Log(score);
         return score;
     }
 

@@ -1,93 +1,155 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
+using System;
 
 public class UIController : MonoBehaviour {
 
-    public Canvas[] weightCanvases;
-    public Canvas typeCanvas;
+    public Canvas weightCanvas;
     public GameController gc;
+    public Canvas lineCanvas;
+    public GameObject line;
+    public Canvas handleCanvas;
+    public Color lastColor;
+    public Color buttonOff;
+
+    enum Weight
+    {
+        One = 5200,
+        Two = 5300,
+        Three = 5400,
+        Four = 5460,
+        Five = 5510,
+        Six = 5540,
+        Seven = 5560,
+        Eight = 5580,
+        Nine = 5615,
+        Ten = 5655,
+        Hack = 5750,
+        Board = 5850,
+        Control = 6050,
+        Normal = 6250,
+        Peel = 6450
+    }
 
     //Hides all the canvases except the shot type select one.
     public void Back()
     {
-        foreach (Canvas c in weightCanvases)
+        /*foreach (Canvas c in weightCanvases)
         {
             c.gameObject.SetActive(false);
         }
-        typeCanvas.gameObject.SetActive(true);
-    }
-    public void toWeights()
-    {
-        typeCanvas.gameObject.SetActive(false);
-        if (gc.type == "Guard")
-        {
-            weightCanvases[0].gameObject.SetActive(true);
-        } else if (gc.type == "Draw") 
-        {
-            weightCanvases[1].gameObject.SetActive(true);
-        }
-        else if (gc.type == "Tap")
-        {
-            weightCanvases[2].gameObject.SetActive(true);
-        } else
-        {
-            weightCanvases[3].gameObject.SetActive(true);
-        }
-        foreach (Toggle t in typeCanvas.GetComponentsInChildren<Toggle>())
-        {
-            t.isOn = false;
-        }
+        typeCanvas.gameObject.SetActive(true);*/
     }
     public void confirmWeight()
     {
-        foreach (Canvas c in weightCanvases)
+        if (gc.weight == 0)
         {
-            c.gameObject.SetActive(false);
-            foreach (Toggle t in c.GetComponentsInChildren<Toggle>())
-            {
-                t.isOn = false;
-            }
-        }
-        gc.nextHandle= Random.Range(-1, 1);
-        if (gc.nextHandle == 0)
-        {
-            gc.nextHandle = 1;
-        }
-        if (gc.nextHandle == 1)
-        {
-            gc.nextDirection = -1.4f;
+            //Popup about how user can't do that
         }
         else
         {
-            gc.nextDirection = 1.4f;
+            weightCanvas.gameObject.SetActive(false);
+            line.SetActive(true);
+            lineCanvas.gameObject.SetActive(true);
         }
+    }
+    public void confirmLine()
+    {
+        lineCanvas.gameObject.SetActive(false);
+        line.SetActive(false);
+        handleCanvas.gameObject.SetActive(true);
+    }
+    public void setWeight(string weight)
+    {
+        Weight weightEnum = (Weight)Enum.Parse(typeof(Weight), weight);
+        float weightAsFloat = (float)weightEnum;
+        gc.weight = weightAsFloat / 1000f;
 
-        if (gc.nextWeight == 0)
+        Color tempColor = lastColor;
+        //Enable all buttons that weren't pushed and disable the one that was
+        foreach (Button b in weightCanvas.GetComponentsInChildren<Button>(true))
         {
-            if (gc.type == "Guard")
+            if (b.name == weight)
             {
-                gc.nextWeight = 5.2f;
-            } else if (gc.type == "Draw")
+                b.enabled = false;
+                lastColor = b.image.color;
+                b.image.color = buttonOff;
+            }
+            else
             {
-                gc.nextWeight = 5.4f;
-            } else if (gc.type == "Tap")
-            {
-                gc.nextWeight = 5.58f;
-            } else
-            {
-                gc.nextWeight = 5.85f;
+                /*if (b.name != "ViewHouse" && b.name != "Confirm")*/
+                if(b.image.color == buttonOff)
+                {
+                    b.image.color = tempColor;
+                    b.enabled = true;
+                }
             }
         }
-            gc.ThrowStone();
-    }
 
-    public void setType(string type)
-    {
-        gc.type = type;
     }
-    public void setWeight(float weight)
+    public void setHandle(int handle)
     {
-        gc.nextWeight = weight;
+        gc.handle = handle;
+        foreach (Button b in handleCanvas.GetComponentsInChildren<Button>())
+        {
+            if (b.name != "Back" && b.name != "Confirm")
+            {
+                if (b.name == "Left")
+                {
+                    if (gc.handle == 1)
+                    {
+                        b.image.color = buttonOff;
+                    }
+                    else
+                    {
+                        //Switch icon here
+                    }
+                }
+                else
+                {
+                    if (gc.handle == -1)
+                    {
+                        b.image.color = buttonOff;
+                    }
+                    else
+                    {
+                        //Switch Icon here
+                    }
+                }
+            }
+        }
+    }
+    public void viewHouse()
+    {
+        for(int i=0;i<weightCanvas.transform.childCount;i++)
+        {
+            Transform t = weightCanvas.transform.GetChild(i);
+            if (t.CompareTag("ViewHouse"))
+            {
+                t.gameObject.SetActive(true);
+                if(t.GetChild(0).GetComponent<Text>().text == "View House")
+                {
+                    t.GetChild(0).GetComponent<Text>().text = "Hide House";
+                } else
+                {
+                    t.GetChild(0).GetComponent<Text>().text = "View House";
+                }
+            }
+            else
+            {
+                t.gameObject.SetActive(!t.gameObject.activeSelf);
+            }
+        }
+    }
+    public void backToLine()
+    {
+        handleCanvas.gameObject.SetActive(false);
+        lineCanvas.gameObject.SetActive(true);
+        line.SetActive(true);
+    }
+    public void confirmHandle()
+    {
+        gc.ThrowStone();
+        handleCanvas.gameObject.SetActive(false);
     }
 }
