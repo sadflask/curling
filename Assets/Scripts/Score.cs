@@ -13,7 +13,7 @@ public class Score {
         float minBlue = sc.findMinimumBlue(gc.stones);
         if (minRed < minBlue)
         {
-            if (minRed > 1.90)
+            if (minRed > 1.98)
             {
                 score = 0;
             }
@@ -28,7 +28,7 @@ public class Score {
         }
         else
         {
-            if (minBlue > 1.90)
+            if (minBlue > 1.98)
             {
                 score = 0;
             }
@@ -88,7 +88,7 @@ public class Score {
             
             float distance = (s.transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude;
             
-            if (distance < minDist && distance < 1.9)
+            if (distance < minDist && distance < 1.98)
             {
                 score++;
                 Debug.Log(string.Format("Stone is at: {0}", s.transform.position));

@@ -11,6 +11,9 @@ public class UIController : MonoBehaviour {
     public Canvas handleCanvas;
     public Color lastColor;
     public Color buttonOff;
+    public Sprite stone;
+    public Sprite rightdown;
+    public Sprite leftdown;
 
     enum Weight
     {
@@ -98,22 +101,22 @@ public class UIController : MonoBehaviour {
                 {
                     if (gc.handle == 1)
                     {
-                        b.image.color = buttonOff;
+                        b.image.sprite = leftdown;
                     }
                     else
                     {
-                        //Switch icon here
+                        b.image.sprite = stone;
                     }
                 }
                 else
                 {
                     if (gc.handle == -1)
                     {
-                        b.image.color = buttonOff;
+                        b.image.sprite = rightdown;
                     }
                     else
                     {
-                        //Switch Icon here
+                        b.image.sprite = stone;
                     }
                 }
             }
