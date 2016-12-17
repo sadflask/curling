@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour {
 
     public GameObject blue, red;
-    int stonesThrown;
+    public int stonesThrown;
     public Stone[] stones = new Stone[16];
     public string throwingTeam = "red";
     public Camera endCam;
@@ -19,10 +19,16 @@ public class GameController : MonoBehaviour {
     public string type;
     public Stone stone = null;
     public int handle;
+    public Text[] redScores;
+    public Text[] blueScores;
+    public Text redTotal;
+    public Text blueTotal;
+    public int ends;
 
     void Start()
     {
         timeout = 2;
+        ends = 0;
         StartCoroutine(Throws());
     }
 
@@ -45,6 +51,7 @@ public class GameController : MonoBehaviour {
         stone.endCam = endCam;
         stone.topCam = topCam;
         stone.canvas = scoreCanvas;
+        stone.gc = this;
 
         endCam.enabled = true;
         topCam.enabled = false;
@@ -55,7 +62,7 @@ public class GameController : MonoBehaviour {
     IEnumerator Throws()
     {
         stonesThrown = 0;
-        for (int j = 0; j < 10; j++)
+        for (ends = 1; ends < 11; ends++)
         {
             for (int i = 0; i < 16; i++)
             {
@@ -74,9 +81,9 @@ public class GameController : MonoBehaviour {
                         //Do nothing
                         yield return null;
                     }
-
+                    stonesThrown++;
                     //Wait until the stone stops to do anything else
-                    while(stone.rb.velocity != Vector3.zero)
+                    while (stone.rb.velocity != Vector3.zero)
                     {
                         //Do nothing
                         yield return null;
@@ -84,7 +91,7 @@ public class GameController : MonoBehaviour {
 
                     //Wait
                     yield return new WaitForSeconds(timeout);
-                    stonesThrown++;
+                    
                     blueIcons[i/2].gameObject.SetActive(false);
                     stone = null;
                     throwingTeam = "red";
@@ -104,7 +111,7 @@ public class GameController : MonoBehaviour {
                         //Do nothing
                         yield return null;
                     }
-
+                    stonesThrown++;
                     //Wait until the stone stops to do anything else
                     while (stone.rb.velocity != Vector3.zero)
                     {
@@ -113,7 +120,7 @@ public class GameController : MonoBehaviour {
                     }
                     //Wait
                     yield return new WaitForSeconds(timeout);
-                    stonesThrown++;
+                    
                     redIcons[i / 2].gameObject.SetActive(false);
                     stone = null;
                     throwingTeam = "blue";
@@ -143,16 +150,16 @@ public class GameController : MonoBehaviour {
             blueIcons[i].color = new Color(1 / 2.55f, 1 / 2.55f, 1);
             blueIcons[i].gameObject.SetActive(true);
         }
-        if (endText.text == "1st End")
+        if (ends == 1)
             endText.text = "2nd End";
-        else if (endText.text == "2nd End")
+        else if (ends == 2)
             endText.text = "3rd End";
-        else if (endText.text == "3rd End")
+        else if (ends == 3)
             endText.text = "4th End";
-        else if (endText.text == "10th End")
+        else if (ends == 9)
             endText.text = "Finished";
         else
-            endText.text = (int.Parse(endText.text.ToCharArray()[0].ToString()) + 1).ToString() + "th End";
+            endText.text = (ends).ToString() + "th End";
     }
 
 }

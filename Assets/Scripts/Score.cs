@@ -37,7 +37,7 @@ public class Score {
                 gc.throwingTeam = "blue";
                 score = sc.getScore(minRed, gc.stones);
                 string[] scores = gc.scoreText.text.Split(null);
-                int currBlue = int.Parse(scores[2]) + score;
+                int currBlue = int.Parse(scores[0]) + score;
                 gc.scoreText.text = currBlue.ToString() + " - " + scores[2];
             }
         }

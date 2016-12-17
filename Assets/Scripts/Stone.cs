@@ -15,6 +15,9 @@ public class Stone : MonoBehaviour {
     public Camera endCam;
     public Camera topCam;
     public Canvas canvas;
+    public bool freeGuard;
+    public Vector3 lastPosition;
+    public GameController gc;
 
 	// Use this for initialization
 	void Start () {
@@ -29,7 +32,7 @@ public class Stone : MonoBehaviour {
         {
             //HIDE SELF
             rb.velocity = Vector3.zero;
-            gameObject.SetActive(false);
+            gameObject.transform.position = new Vector3(5, 0.3f, 15 + gc.stonesThrown);
         } else if (other.CompareTag("CameraProc"))
         {
             //CHANGE CAMERA
@@ -75,7 +78,7 @@ public class Stone : MonoBehaviour {
             float newSpeed, newCurl;
             if (rb.velocity.z > 5)
             {
-                newCurl = Mathf.Clamp(rb.velocity.x + (handle * Time.deltaTime * (20 - rb.velocity.z) / 1250), -2, 2);
+                newCurl = Mathf.Clamp(rb.velocity.x + (handle * Time.deltaTime * (20 - rb.velocity.z) / 1500), -2, 2);
             }
             else
             {
@@ -96,9 +99,36 @@ public class Stone : MonoBehaviour {
         } else
         {
             float newSpeed;
-           
             newSpeed = Mathf.Clamp(rb.velocity.magnitude - Time.deltaTime * (20 - rb.velocity.magnitude)/40, 0, 50);
             rb.velocity = rb.velocity.normalized * newSpeed;
+            
+            if (newSpeed < 0.01)
+            {
+                if (gc.stonesThrown < 4 )
+                {
+                    if (freeGuard)
+                    {
+                        if(transform.position.x == 5)
+                        {
+                            Debug.Log(string.Format("Stones thrown = {0}",gc.stonesThrown));
+                            //Remove offending stone
+                            gc.stones[gc.stonesThrown-1].transform.position = new Vector3(5, 0.3f, 15 + gc.stonesThrown);
+                            gc.stones[gc.stonesThrown - 1].gameObject.SetActive(false);
+
+                            //Move stone back into play
+                            transform.position = lastPosition;
+                        }
+                    }
+                    //If the stone is in front of the tee line and outside the house it is in the freeguard zone
+                    if (transform.position.z < 17.37 && (transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude > 1.9 ) {
+                        freeGuard = true;
+                        lastPosition = transform.position;
+                    } else
+                    {
+                        freeGuard = false;
+                    }
+                }
+            }
         }
     }
 }
