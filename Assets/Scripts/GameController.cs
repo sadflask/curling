@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour {
 
     public GameObject blue, red;
+    public UIController ui;
     public int stonesThrown;
     public Stone[] stones = new Stone[16];
     public string throwingTeam = "red";
@@ -13,10 +14,10 @@ public class GameController : MonoBehaviour {
     public int timeout;
     public Canvas scoreCanvas;
     public Canvas typeCanvas;
+    public Canvas endCanvas;
     public Image[] blueIcons, redIcons;
     public Text scoreText, endText;
     public float weight, direction;
-    public string type;
     public Stone stone = null;
     public int handle;
     public Text[] redScores;
@@ -24,12 +25,21 @@ public class GameController : MonoBehaviour {
     public Text redTotal;
     public Text blueTotal;
     public int ends;
+    public Canvas scoreboard;
+    public Text endsTitle;
+    public bool ready;
+    private AI ai;
+    public Canvas intro;
 
     void Start()
     {
         timeout = 2;
         ends = 0;
+        ai = new NormalAI();
+        ai.gc = this;
+        ai.sc = new Score();
         StartCoroutine(Throws());
+       
     }
 
     public Stone ThrowStone()
@@ -43,7 +53,7 @@ public class GameController : MonoBehaviour {
             toThrow = red;
         }
         stone = Instantiate(toThrow).GetComponent<Stone>();
-        stone.force = weight;
+        stone.force = weight/1000f;
         stone.transform.rotation = Quaternion.Euler(0.0f, direction, 0.0f);
         stone.handle = handle;
         stone.color = throwingTeam;
@@ -61,77 +71,39 @@ public class GameController : MonoBehaviour {
     }
     IEnumerator Throws()
     {
+        endCam.enabled = true;
+        topCam.enabled = false;
+        endCam.transform.position = new Vector3(0, 13, 22.25f);
+        endCam.transform.rotation = Quaternion.Euler(new Vector3(30, 180, 0));
+        
+        //Do intro sequence
+        for (int i = 0; i < 400; i++)
+        {
+            endCam.transform.RotateAround(Vector3.zero, Vector3.up, 45 * 0.01f);
+            endCam.transform.position = new Vector3(endCam.transform.position.x, endCam.transform.position.y-0.02f, endCam.transform.position.z);
+            //Do something
+            yield return new WaitForSeconds(0.01f);
+        }
+        yield return new WaitForSeconds(1);
+        intro.gameObject.SetActive(false);
+        scoreCanvas.gameObject.SetActive(true);
+
         stonesThrown = 0;
         for (ends = 1; ends < 11; ends++)
         {
-            for (int i = 0; i < 16; i++)
-            {
-                if (throwingTeam == "blue")
-                {
-                    blueIcons[i/2].color = new Color(1 / 2.55f, 1 / 2.55f, 1, 1 / 2.55f);
-
-                    //Open the throw dialog
-                    typeCanvas.gameObject.SetActive(true);
-                    topCam.enabled = true;
-                    endCam.enabled = false;
-
-                    //Wait until the user throws the stone
-                    while (stone == null)
-                    {
-                        //Do nothing
-                        yield return null;
-                    }
-                    stonesThrown++;
-                    //Wait until the stone stops to do anything else
-                    while (stone.rb.velocity != Vector3.zero)
-                    {
-                        //Do nothing
-                        yield return null;
-                    }
-
-                    //Wait
-                    yield return new WaitForSeconds(timeout);
-                    
-                    blueIcons[i/2].gameObject.SetActive(false);
-                    stone = null;
-                    throwingTeam = "red";
-                }
-                else
-                {
-                    redIcons[i / 2].color = new Color(1, 1 / 2.55f, 1 / 2.55f, 1 / 2.55f);
-
-                    //Open the throw dialog
-                    typeCanvas.gameObject.SetActive(true);
-                    topCam.enabled = true;
-                    endCam.enabled = false;
-
-                    //Wait until the user throws the stone
-                    while (stone == null)
-                    {
-                        //Do nothing
-                        yield return null;
-                    }
-                    stonesThrown++;
-                    //Wait until the stone stops to do anything else
-                    while (stone.rb.velocity != Vector3.zero)
-                    {
-                        //Do nothing
-                        yield return null;
-                    }
-                    //Wait
-                    yield return new WaitForSeconds(timeout);
-                    
-                    redIcons[i / 2].gameObject.SetActive(false);
-                    stone = null;
-                    throwingTeam = "blue";
-                }
-            }
-
-            yield return new WaitForSeconds(2);
-            
-            //Calculate who scored
-            Score.score(GetComponent<GameController>());
-            cleanUp();
+            PlayEnd();
+        }
+        //End of game unless scores tied
+        while (Scores are equal) {
+            //Play another end
+            PlayEnd();
+        }
+        if (yourscore > opponentsscore)
+        {
+            //Display Victory
+        } else
+        {
+            //Display Loss Message
         }
     }
     
@@ -156,10 +128,109 @@ public class GameController : MonoBehaviour {
             endText.text = "3rd End";
         else if (ends == 3)
             endText.text = "4th End";
-        else if (ends == 9)
+        else if (ends == 10)
             endText.text = "Finished";
         else
-            endText.text = (ends).ToString() + "th End";
+            endText.text = (ends+1).ToString() + "th End";
+    }
+    private IEnumerator PlayEnd()
+    {
+        //Play one end
+        endCam.enabled = true;
+        topCam.enabled = false;
+        scoreCanvas.worldCamera = endCam;
+        endCanvas.gameObject.SetActive(true);
+        endCanvas.GetComponentInChildren<Text>().text = endText.text;
+        yield return new WaitForSeconds(2.0f);
+        endCanvas.gameObject.SetActive(false);
+        for (int i = 0; i < 16; i++)
+        {
+            if (throwingTeam == "blue")
+            {
+                blueIcons[i / 2].color = new Color(1 / 2.55f, 1 / 2.55f, 1, 1 / 2.55f);
+
+                //Open the throw dialog
+                typeCanvas.gameObject.SetActive(true);
+                topCam.enabled = true;
+                endCam.enabled = false;
+
+                //Wait until the user throws the stone
+                while (stone == null)
+                {
+                    //Do nothing
+                    yield return null;
+                }
+                stonesThrown++;
+                //Wait until the stone stops to do anything else
+                while (stone.rb.velocity != Vector3.zero)
+                {
+                    //Do nothing
+                    yield return null;
+                }
+
+                //Wait
+                yield return new WaitForSeconds(timeout);
+
+                blueIcons[i / 2].gameObject.SetActive(false);
+                stone = null;
+                throwingTeam = "red";
+            }
+            else
+            {
+                redIcons[i / 2].color = new Color(1, 1 / 2.55f, 1 / 2.55f, 1 / 2.55f);
+
+                /*//Open the throw dialog
+                typeCanvas.gameObject.SetActive(true);*/
+                topCam.enabled = true;
+                endCam.enabled = false;
+
+                //Get the AI to choose what stone to throw
+                ai.DecideOnShot();
+
+                //Wait until the user throws the stone
+                while (stone == null)
+                {
+                    //Do nothing
+                    yield return null;
+                }
+                stonesThrown++;
+
+                yield return new WaitForSeconds(1);
+
+                //Wait until the stone stops to do anything else
+                while (stone.rb.velocity != Vector3.zero)
+                {
+                    //Do nothing
+                    yield return null;
+                }
+
+                Debug.Log("Ready to go");
+                //Wait
+                yield return new WaitForSeconds(timeout);
+
+                redIcons[i / 2].gameObject.SetActive(false);
+                stone = null;
+                throwingTeam = "blue";
+            }
+        }
+
+        yield return new WaitForSeconds(2);
+
+        //Calculate who scored
+        Score.score(GetComponent<GameController>());
+        cleanUp();
+
+        endsTitle.text = "Score after " + ends.ToString() + " end";
+        if (ends != 1)
+        {
+            endsTitle.text += "s";
+        }
+        ready = false;
+        scoreboard.gameObject.SetActive(true);
+
+        yield return new WaitUntil(() => ready);
+
+        scoreboard.gameObject.SetActive(false);
     }
 
 }

@@ -32,7 +32,7 @@ public class Stone : MonoBehaviour {
         {
             //HIDE SELF
             rb.velocity = Vector3.zero;
-            gameObject.transform.position = new Vector3(5, 0.3f, 15 + gc.stonesThrown);
+            gameObject.transform.position = new Vector3(5, -1, 18);
         } else if (other.CompareTag("CameraProc"))
         {
             //CHANGE CAMERA
@@ -43,12 +43,13 @@ public class Stone : MonoBehaviour {
             Stone otherStone = other.gameObject.GetComponent<Stone>();
             //Set angle of self and other
             curling = false;
-            if (Mathf.Abs(lastHit - Time.time) < 0.001)
+            if (Mathf.Abs(lastHit - Time.time) < 0.0001)
                 return;
 
-            //If the stone is moving, it is the shooter. Keeping the logic here means it only gets executed once.
+            //If the stone is moving faster than the other, it is the shooter. Keeping the logic here means it only gets executed once.
             if (rb.velocity.magnitude > otherStone.rb.velocity.magnitude)
             {
+                Debug.Log(Time.realtimeSinceStartup);
                 GetComponent<AudioSource>().volume = rb.velocity.magnitude / 6.0f;
                 Vector3 otherVector = other.gameObject.transform.position - gameObject.transform.position;
                 float tangDistance = Vector3.Cross(rb.velocity.normalized, otherVector).magnitude;
@@ -78,7 +79,7 @@ public class Stone : MonoBehaviour {
             float newSpeed, newCurl;
             if (rb.velocity.z > 5)
             {
-                newCurl = Mathf.Clamp(rb.velocity.x + (handle * Time.deltaTime * (20 - rb.velocity.z) / 1500), -2, 2);
+                newCurl = Mathf.Clamp(rb.velocity.x + (handle * Time.deltaTime * (20 - rb.velocity.z) / 1250), -2, 2);
             }
             else
             {
@@ -112,15 +113,15 @@ public class Stone : MonoBehaviour {
                         {
                             Debug.Log(string.Format("Stones thrown = {0}",gc.stonesThrown));
                             //Remove offending stone
-                            gc.stones[gc.stonesThrown-1].transform.position = new Vector3(5, 0.3f, 15 + gc.stonesThrown);
+                            gc.stones[gc.stonesThrown-1].transform.position = new Vector3(5, -1, 18);
                             gc.stones[gc.stonesThrown - 1].gameObject.SetActive(false);
 
                             //Move stone back into play
                             transform.position = lastPosition;
                         }
                     }
-                    //If the stone is in front of the tee line and outside the house it is in the freeguard zone
-                    if (transform.position.z < 17.37 && (transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude > 1.9 ) {
+                    
+                    if (isGuard()) {
                         freeGuard = true;
                         lastPosition = transform.position;
                     } else
@@ -130,5 +131,26 @@ public class Stone : MonoBehaviour {
                 }
             }
         }
+    }
+    //If the stone is in front of the tee line and outside the house it is in the freeguard zone
+    public bool isGuard()
+    {
+        if (!inHouse())
+        {
+            if (transform.position.z < 17.37)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    public bool inHouse()
+    {
+        float distance = (transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude;
+        if (distance < 1.98)
+        {
+            return true;
+        }
+        return false;
     }
 }

@@ -15,7 +15,7 @@ public class UIController : MonoBehaviour {
     public Sprite rightdown;
     public Sprite leftdown;
 
-    enum Weight
+    public enum Weight
     {
         One = 5200,
         Two = 5300,
@@ -65,8 +65,7 @@ public class UIController : MonoBehaviour {
     public void setWeight(string weight)
     {
         Weight weightEnum = (Weight)Enum.Parse(typeof(Weight), weight);
-        float weightAsFloat = (float)weightEnum;
-        gc.weight = weightAsFloat / 1000f;
+        gc.weight = (float)weightEnum;
 
         Color tempColor = lastColor;
         //Enable all buttons that weren't pushed and disable the one that was
@@ -154,5 +153,9 @@ public class UIController : MonoBehaviour {
     {
         gc.ThrowStone();
         handleCanvas.gameObject.SetActive(false);
+    }
+    public void toNextEnd()
+    {
+        gc.ready = true;
     }
 }
