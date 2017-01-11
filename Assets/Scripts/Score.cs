@@ -3,15 +3,15 @@ using System.Collections;
 
 public class Score {
     //Calculate the number of points scored
-    private static Score sc;
+    public int blueScore;
+    public int redScore;
 
-    public static int score(GameController gc)
+    public int CalculateScore(GameController gc)
     {
-        sc = new Score(); 
         int score = 0;
         Stone blue, red;
-        float minRed = sc.findMinimumRed(gc.stones, out red);
-        float minBlue = sc.findMinimumBlue(gc.stones, out blue);
+        float minRed = gc.sc.FindMinimumRed(gc.stones, out red);
+        float minBlue = gc.sc.FindMinimumBlue(gc.stones, out blue);
         if (minRed < minBlue)
         {
             if (minRed > 1.98)
@@ -22,12 +22,13 @@ public class Score {
             else
             {
                 gc.throwingTeam = "red";
-                score = sc.getScore(minBlue, gc.stones);
+                score = gc.sc.GetScoreValue(minBlue, gc.stones);
                 string[] scores = gc.scoreText.text.Split(null);
                 int currRed = int.Parse(scores[2]) + score;
                 gc.scoreText.text = scores[0] + " - " + currRed.ToString();
                 gc.redTotal.text = currRed.ToString();
                 gc.redScores[gc.ends-1].text = score.ToString();
+                redScore = currRed;
             }
             gc.blueScores[gc.ends-1].text = "0";
         }
@@ -41,12 +42,13 @@ public class Score {
             else
             {
                 gc.throwingTeam = "blue";
-                score = sc.getScore(minRed, gc.stones);
+                score = gc.sc.GetScoreValue(minRed, gc.stones);
                 string[] scores = gc.scoreText.text.Split(null);
                 int currBlue = int.Parse(scores[0]) + score;
                 gc.scoreText.text = currBlue.ToString() + " - " + scores[2];
                 gc.blueTotal.text = currBlue.ToString();
                 gc.blueScores[gc.ends-1].text = score.ToString();
+                blueScore = currBlue;
             }
             gc.redScores[gc.ends-1].text = "0";
         }
@@ -54,7 +56,7 @@ public class Score {
     }
 
     //Iterate through stone array to find closest red stone
-    public float findMinimumRed(Stone[] stones, out Stone closestRed)
+    public float FindMinimumRed(Stone[] stones, out Stone closestRed)
     {
         float min = 200;
         closestRed = null;
@@ -75,7 +77,7 @@ public class Score {
         return min;
     }
     //Iterate through stone array to find closest blue stone
-    public float findMinimumBlue(Stone[] stones, out Stone closestBlue)
+    public float FindMinimumBlue(Stone[] stones, out Stone closestBlue)
     {
         float min = 200;
         closestBlue = null;
@@ -98,7 +100,7 @@ public class Score {
     }
 
     //This function finds the number of stones closer than that of the other team
-    int getScore(float minDist, Stone[] stones)
+    int GetScoreValue(float minDist, Stone[] stones)
     {
         int score = 0;
         foreach (Stone s in stones)

@@ -30,6 +30,7 @@ public class GameController : MonoBehaviour {
     public bool ready;
     private AI ai;
     public Canvas intro;
+    public Score sc;
 
     void Start()
     {
@@ -37,7 +38,7 @@ public class GameController : MonoBehaviour {
         ends = 0;
         ai = new NormalAI();
         ai.gc = this;
-        ai.sc = new Score();
+        sc = new Score();
         StartCoroutine(Throws());
        
     }
@@ -89,25 +90,32 @@ public class GameController : MonoBehaviour {
         scoreCanvas.gameObject.SetActive(true);
 
         stonesThrown = 0;
-        for (ends = 1; ends < 11; ends++)
+        for (ends = 1; ends < 7; ends++)
         {
-            PlayEnd();
+            StartCoroutine(PlayEnd());
+            ready = false;
+            yield return new WaitUntil(() => ready);
         }
         //End of game unless scores tied
-        while (Scores are equal) {
+        if(sc.blueScore == sc.redScore) {
             //Play another end
-            PlayEnd();
+            StartCoroutine(PlayEnd());
+            ends++;
         }
-        if (yourscore > opponentsscore)
+        if (sc.blueScore > sc.redScore)
         {
-            //Display Victory
+            ui.ShowResult(ends, sc.blueScore, sc.redScore, true);
         } else
         {
             //Display Loss Message
+            ui.ShowResult(ends, sc.blueScore, sc.redScore, false);
         }
     }
-    
-    void cleanUp()
+    void DisplayMessage()
+    {
+        endCanvas.gameObject.SetActive(true);
+    }
+    void CleanUp()
     {
         stonesThrown = 0;
         foreach (Stone s in stones)
@@ -133,12 +141,14 @@ public class GameController : MonoBehaviour {
         else
             endText.text = (ends+1).ToString() + "th End";
     }
-    private IEnumerator PlayEnd()
+
+    IEnumerator PlayEnd()
     {
+        Debug.Log("Playing End");
         //Play one end
-        endCam.enabled = true;
-        topCam.enabled = false;
-        scoreCanvas.worldCamera = endCam;
+        endCam.enabled = false;
+        topCam.enabled = true;
+        scoreCanvas.worldCamera = topCam;
         endCanvas.gameObject.SetActive(true);
         endCanvas.GetComponentInChildren<Text>().text = endText.text;
         yield return new WaitForSeconds(2.0f);
@@ -217,15 +227,14 @@ public class GameController : MonoBehaviour {
         yield return new WaitForSeconds(2);
 
         //Calculate who scored
-        Score.score(GetComponent<GameController>());
-        cleanUp();
+        sc.CalculateScore(GetComponent<GameController>());
+        CleanUp();
 
         endsTitle.text = "Score after " + ends.ToString() + " end";
         if (ends != 1)
         {
             endsTitle.text += "s";
         }
-        ready = false;
         scoreboard.gameObject.SetActive(true);
 
         yield return new WaitUntil(() => ready);

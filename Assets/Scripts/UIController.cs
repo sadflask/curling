@@ -9,6 +9,7 @@ public class UIController : MonoBehaviour {
     public Canvas lineCanvas;
     public GameObject line;
     public Canvas handleCanvas;
+    public Canvas resultCanvas;
     public Color lastColor;
     public Color buttonOff;
     public Sprite stone;
@@ -35,15 +36,13 @@ public class UIController : MonoBehaviour {
     }
 
     //Hides all the canvases except the shot type select one.
-    public void Back()
+    public void BackToWeight()
     {
-        /*foreach (Canvas c in weightCanvases)
-        {
-            c.gameObject.SetActive(false);
-        }
-        typeCanvas.gameObject.SetActive(true);*/
+        weightCanvas.gameObject.SetActive(true);
+        lineCanvas.gameObject.SetActive(false);
+        line.SetActive(false);
     }
-    public void confirmWeight()
+    public void ConfirmWeight()
     {
         if (gc.weight == 0)
         {
@@ -56,13 +55,38 @@ public class UIController : MonoBehaviour {
             lineCanvas.gameObject.SetActive(true);
         }
     }
-    public void confirmLine()
+    public void ShowResult(int ends, int scoreBlue, int scoreRed, bool won)
+    {
+        resultCanvas.gameObject.SetActive(false);
+        foreach (Text t in resultCanvas.GetComponentsInChildren<Text>())
+        {
+            switch (t.name)
+            {
+                case "Result":
+                    if (won)
+                        t.text = "VICTORY!";
+                    else
+                        t.text = "DEFEAT";
+                    break;
+                case "End":
+                    t.text = ends.ToString();
+                    break;
+                case "Blue Score":
+                    t.text = scoreBlue.ToString();
+                    break;
+                case "Red Score":
+                    t.text = scoreRed.ToString();
+                    break;
+            }
+        }
+    }
+    public void ConfirmLine()
     {
         lineCanvas.gameObject.SetActive(false);
         line.SetActive(false);
         handleCanvas.gameObject.SetActive(true);
     }
-    public void setWeight(string weight)
+    public void SetWeight(string weight)
     {
         Weight weightEnum = (Weight)Enum.Parse(typeof(Weight), weight);
         gc.weight = (float)weightEnum;
@@ -89,7 +113,7 @@ public class UIController : MonoBehaviour {
         }
 
     }
-    public void setHandle(int handle)
+    public void SetHandle(int handle)
     {
         gc.handle = handle;
         foreach (Button b in handleCanvas.GetComponentsInChildren<Button>())
@@ -121,7 +145,7 @@ public class UIController : MonoBehaviour {
             }
         }
     }
-    public void viewHouse()
+    public void ViewHouse()
     {
         for(int i=0;i<weightCanvas.transform.childCount;i++)
         {
@@ -143,18 +167,18 @@ public class UIController : MonoBehaviour {
             }
         }
     }
-    public void backToLine()
+    public void BackToLine()
     {
         handleCanvas.gameObject.SetActive(false);
         lineCanvas.gameObject.SetActive(true);
         line.SetActive(true);
     }
-    public void confirmHandle()
+    public void ConfirmHandle()
     {
         gc.ThrowStone();
         handleCanvas.gameObject.SetActive(false);
     }
-    public void toNextEnd()
+    public void ToNextEnd()
     {
         gc.ready = true;
     }

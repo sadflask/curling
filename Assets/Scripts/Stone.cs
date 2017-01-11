@@ -121,7 +121,7 @@ public class Stone : MonoBehaviour {
                         }
                     }
                     
-                    if (isGuard()) {
+                    if (IsGuard()) {
                         freeGuard = true;
                         lastPosition = transform.position;
                     } else
@@ -133,9 +133,9 @@ public class Stone : MonoBehaviour {
         }
     }
     //If the stone is in front of the tee line and outside the house it is in the freeguard zone
-    public bool isGuard()
+    public bool IsGuard()
     {
-        if (!inHouse())
+        if (!InHouse())
         {
             if (transform.position.z < 17.37)
             {
@@ -144,7 +144,7 @@ public class Stone : MonoBehaviour {
         }
         return false;
     }
-    public bool inHouse()
+    public bool InHouse()
     {
         float distance = (transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude;
         if (distance < 1.98)

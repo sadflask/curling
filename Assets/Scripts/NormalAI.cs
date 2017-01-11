@@ -79,8 +79,8 @@ public class NormalAI : AI {
                     break;
             }
         }
-        gc.ui.setHandle(handle);
-        gc.ui.setWeight(weight.ToString());
+        gc.ui.SetHandle(handle);
+        gc.ui.SetWeight(weight.ToString());
         gc.ThrowStone();
     }
 }

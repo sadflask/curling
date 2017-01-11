@@ -4,7 +4,6 @@ using System;
 
 public abstract class AI {
     public GameController gc;
-    public Score sc;
     protected UIController.Weight weight = UIController.Weight.Seven;
     protected int handle = -1;
     protected Stone closestRed = null;
@@ -124,15 +123,15 @@ public abstract class AI {
     }
     protected GameState DetermineState()
     {
-        float redDistance = sc.findMinimumRed(gc.stones, out closestRed);
-        float blueDistance = sc.findMinimumBlue(gc.stones, out closestBlue);
+        float redDistance = gc.sc.FindMinimumRed(gc.stones, out closestRed);
+        float blueDistance = gc.sc.FindMinimumBlue(gc.stones, out closestBlue);
         if (redDistance > 1.98 && blueDistance > 1.98)
         {
             foreach (Stone s in gc.stones)
             {
                 if (s != null)
                 {
-                    if (s.isGuard())
+                    if (s.IsGuard())
                     {
                         guard = s;
                         return GameState.EmptyHouseGuarded;
@@ -142,7 +141,7 @@ public abstract class AI {
             return GameState.EmptyHouseOpen;
         } else if (blueDistance < redDistance) 
         {
-            if (isGuarded(closestBlue, out guard))
+            if (IsGuarded(closestBlue, out guard))
             {
                 return GameState.OpponentSittingGuarded;
             } else
@@ -151,7 +150,7 @@ public abstract class AI {
             }
         } else if (blueDistance >= redDistance)
         {
-            if (isGuarded(closestRed, out guard))
+            if (IsGuarded(closestRed, out guard))
             {
                 return GameState.SittingGuarded;
             } else
@@ -163,7 +162,7 @@ public abstract class AI {
             return GameState.EmptyHouseOpen;
         }
     }
-    bool isGuarded(Stone toGuard, out Stone guard)
+    bool IsGuarded(Stone toGuard, out Stone guard)
     {
         foreach(Stone s in gc.stones)
         {
