@@ -1,136 +1,178 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class Stone : MonoBehaviour {
-
-    public Rigidbody rb;
-    public float force;
-    Vector3 pushingForce;
-    Vector3 initialVelocity;
-    public bool curling;
-    public bool collided;
     public float lastHit;
-    public int handle;
-    public string color;
-    public Camera endCam;
-    public Camera topCam;
-    public Canvas canvas;
-    public bool freeGuard;
+
+    public int playerIndex;
+
+    //Flags to signal what state the stone is in
+    private bool isFreeGuard;
+    private bool isCurling;
+    private bool passedHog;
     public Vector3 lastPosition;
+
+    public Vector3 velocity;
+
+    //Settings that set the stone's path
+    public float weight;
+    public int handle;
+
+    //Current modifiers for the stone's path
+    private float curl;
+    private float drag;
+
+    public Canvas canvas;
     public GameController gc;
+    public float startTime;
 
 	// Use this for initialization
 	void Start () {
-	    rb = GetComponent<Rigidbody>();
-        rb.velocity = (transform.forward * force);
-        curling = true;
+        gc = FindObjectOfType<GameController>();
+        isCurling = true;
+        passedHog = false;
+        startTime = Time.time;
+        velocity = weight * transform.forward;
     }
-
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Boundary"))
         {
             //HIDE SELF
-            rb.velocity = Vector3.zero;
+            velocity = Vector3.zero;
             gameObject.transform.position = new Vector3(5, -1, 18);
         } else if (other.CompareTag("CameraProc"))
         {
-            //CHANGE CAMERA
-            endCam.enabled = false;
-            topCam.enabled = true;
-            canvas.worldCamera = topCam;
-        } else if (other.CompareTag("Stone")) {
-            Stone otherStone = other.gameObject.GetComponent<Stone>();
+            //Change player position;
+            if (gc.gState.players[playerIndex])
+            {
+                gc.gState.players[playerIndex].transform.position = gc.gState.topPosition.transform.position;
+                gc.gState.players[playerIndex].transform.rotation = gc.gState.topPosition.transform.rotation;
+            }
+            passedHog = true;
+        }
+    }
+    void OnCollisionEnter(Collision c) {
+        if (c.gameObject.CompareTag("Stone")) {
+            Stone otherStone = c.gameObject.GetComponent<Stone>();
             //Set angle of self and other
-            curling = false;
-            if (Mathf.Abs(lastHit - Time.time) < 0.0001)
+            isCurling = false;
+            if (Mathf.Abs(lastHit - Time.time) < 0.01)
                 return;
 
             //If the stone is moving faster than the other, it is the shooter. Keeping the logic here means it only gets executed once.
-            if (rb.velocity.magnitude > otherStone.rb.velocity.magnitude)
+            if (velocity.magnitude > otherStone.velocity.magnitude)
             {
-                Debug.Log(Time.realtimeSinceStartup);
-                GetComponent<AudioSource>().volume = rb.velocity.magnitude / 6.0f;
-                Vector3 otherVector = other.gameObject.transform.position - gameObject.transform.position;
-                float tangDistance = Vector3.Cross(rb.velocity.normalized, otherVector).magnitude;
-                Vector3 shooterVector = Vector3.Cross(otherVector, Vector3.up);
-                if (shooterVector.z < 0)
-                {
-                    shooterVector = shooterVector * -1;
-                }
+                //Find the vector between the two stones, this will be the new velocity of the hit stone.
+                Vector3 vectorBetween = otherStone.transform.position - gameObject.transform.position;
+                //Find the tangential distance between the velocity of the shooter and the vector between the stones.
+                float tangDistance = Vector3.Cross(velocity.normalized, vectorBetween).magnitude;
                 tangDistance = Mathf.Abs(tangDistance);
-                collided = true;
-                otherStone.collided = true;
-                otherStone.rb.velocity = otherVector.normalized * rb.velocity.magnitude * (1 - tangDistance / 0.31f);
-                rb.velocity = shooterVector.normalized * rb.velocity.magnitude * (tangDistance / 0.31f);
+                //Get the vector that the shooter will travel along using the cross product. If this is greater than 90 degrees 
+                //away from the initial velocity then reverse it.
+                Vector3 shooterVector = Vector3.Cross(vectorBetween, Vector3.up);
+                if (Vector3.Angle(shooterVector, velocity) > 90)
+                {
+                    shooterVector *= -1;
+                }
+
+                //Set the sizes of the velocities
+                float hitSize = velocity.magnitude * (1 - Mathf.Clamp01(tangDistance / vectorBetween.magnitude));
+                float shooterSize = velocity.magnitude * (Mathf.Clamp01(tangDistance / vectorBetween.magnitude));
+
+                //Set velocities of the rigidbodies through the xCurl and zWeight attributes
+                velocity = shooterVector.normalized * shooterSize;
+
+                otherStone.velocity = vectorBetween.normalized * hitSize;
 
                 otherStone.lastHit = Time.time;
                 lastHit = Time.time;
-                GetComponent<AudioSource>().Play();
+
             }
         }
     }
+   
     // Update is called once per frame
     void FixedUpdate() {
-        if (curling)
+        if (isCurling)
         {
-            //Move camera to stone
-            endCam.gameObject.transform.position = new Vector3(0, 3, rb.position.z - 5f);
-            float newSpeed, newCurl;
-            if (rb.velocity.z > 5)
+            if (!passedHog)
             {
-                newCurl = Mathf.Clamp(rb.velocity.x + (handle * Time.deltaTime * (20 - rb.velocity.z) / 1250), -2, 2);
+                //Move camera to stone
+                if (gc.gState.players[playerIndex])
+                {
+                    gc.gState.players[playerIndex].transform.position = new Vector3(0, 2, transform.position.z - 3.5f);
+                    gc.gState.players[playerIndex].transform.rotation = gc.gState.stonePosition.transform.rotation;
+                }
+            }
+            //Make the stone curl more at lower speeds
+            if (velocity.magnitude > 3)
+            {
+                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (20 - velocity.magnitude) / 2500), -2, 2);
             }
             else
             {
-                newCurl = Mathf.Clamp(rb.velocity.x + (handle * Time.deltaTime * (20 - rb.velocity.z) / 750), -2, 2);
-                
+                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (20 - velocity.magnitude) / 1500), -2, 2);
             }
-            newSpeed = Mathf.Clamp(rb.velocity.z - Time.deltaTime * (20 - rb.velocity.z) / 40, 0, 50);
-            if (rb.velocity.z < 0.1)
+            
+            //Add the curl on to the current velocity.
+            velocity = new Vector3(curl, 0, velocity.z);
+
+            //Subtract the drag from the current velocity.
+            drag = Time.deltaTime * (10 - velocity.magnitude) / 35;
+
+            velocity -= drag * velocity.normalized;
+
+            if (velocity.magnitude < 0.02)
             {
-                newCurl = 0;
-                curling = false;
+                isCurling = false;
             }
             else
             {
-                rb.rotation = Quaternion.Euler(new Vector3(0, rb.rotation.eulerAngles.y +  handle * 2, 0));
+                //Spin the stone
+                transform.rotation = Quaternion.Euler(new Vector3(0, transform.rotation.eulerAngles.y + handle, 0));
             }
-            rb.velocity = new Vector3(newCurl, 0, newSpeed);
-        } else
+        }
+        else 
         {
             float newSpeed;
-            newSpeed = Mathf.Clamp(rb.velocity.magnitude - Time.deltaTime * (20 - rb.velocity.magnitude)/40, 0, 50);
-            rb.velocity = rb.velocity.normalized * newSpeed;
-            
+            drag = Time.deltaTime * (20 - velocity.magnitude) / 80;
+            newSpeed = velocity.magnitude - drag;
+            velocity = velocity.normalized * newSpeed;
+
+            //When the stone stops
             if (newSpeed < 0.01)
             {
-                if (gc.stonesThrown < 4 )
+                velocity = Vector3.zero;
+                //Determine if the free guard zone is still applicable
+                if (gc.gState.stonesThrown < 4)
                 {
-                    if (freeGuard)
+                    if (isFreeGuard)
                     {
-                        if(transform.position.x == 5)
+                        //Check if the stone was removed from play, and if so replace it
+                        if (transform.position.x == 5)
                         {
-                            Debug.Log(string.Format("Stones thrown = {0}",gc.stonesThrown));
+                            Debug.Log(string.Format("Stones thrown = {0}", gc.gState.stonesThrown));
                             //Remove offending stone
-                            gc.stones[gc.stonesThrown-1].transform.position = new Vector3(5, -1, 18);
-                            gc.stones[gc.stonesThrown - 1].gameObject.SetActive(false);
+                            gc.gState.stones[gc.gState.stonesThrown - 1].transform.position = new Vector3(5, -1, 18);
+                            gc.gState.stones[gc.gState.stonesThrown - 1].gameObject.SetActive(false);
 
                             //Move stone back into play
                             transform.position = lastPosition;
                         }
                     }
-                    
-                    if (IsGuard()) {
-                        freeGuard = true;
-                        lastPosition = transform.position;
-                    } else
+                    if (IsGuard())
                     {
-                        freeGuard = false;
+                        isFreeGuard = true;
+                        lastPosition = transform.position;
+                    }
+                    else
+                    {
+                        isFreeGuard = false;
                     }
                 }
             }
         }
+        transform.position = transform.position + velocity * Time.deltaTime;
     }
     //If the stone is in front of the tee line and outside the house it is in the freeguard zone
     public bool IsGuard()

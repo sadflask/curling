@@ -1,8 +1,10 @@
 ﻿<Properties StartupItem="Curling.CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Stone.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Singleplayer\Controllers\AI.cs">
     <Files>
-      <File FileName="Assets\Scripts\Stone.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Singleplayer\Controllers\PlayerController.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\ConfigUI.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Singleplayer\Controllers\AI.cs" Line="113" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
