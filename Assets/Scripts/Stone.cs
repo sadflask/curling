@@ -23,15 +23,16 @@ public class Stone : MonoBehaviour {
 
     public Canvas canvas;
     public GameController gc;
-    public float startTime;
+
+    private AudioSource[] sources;
 
 	// Use this for initialization
 	void Start () {
         gc = FindObjectOfType<GameController>();
         isCurling = true;
         passedHog = false;
-        startTime = Time.time;
         velocity = weight * transform.forward;
+        sources = GetComponents<AudioSource>();
     }
     void OnTriggerEnter(Collider other)
     {
@@ -78,6 +79,11 @@ public class Stone : MonoBehaviour {
                 //Set the sizes of the velocities
                 float hitSize = velocity.magnitude * (1 - Mathf.Clamp01(tangDistance / vectorBetween.magnitude));
                 float shooterSize = velocity.magnitude * (Mathf.Clamp01(tangDistance / vectorBetween.magnitude));
+
+                float audioSize = hitSize / velocity.magnitude; //Will be between 0 and 1.
+
+                sources[1].volume = audioSize;
+                sources[1].Play();
 
                 //Set velocities of the rigidbodies through the xCurl and zWeight attributes
                 velocity = shooterVector.normalized * shooterSize;
