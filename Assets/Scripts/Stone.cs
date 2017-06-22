@@ -63,6 +63,8 @@ public class Stone : MonoBehaviour {
             //If the stone is moving faster than the other, it is the shooter. Keeping the logic here means it only gets executed once.
             if (velocity.magnitude > otherStone.velocity.magnitude)
             {
+                float audioSize = velocity.magnitude / 4.5f;//Never greater than 1
+
                 //Find the vector between the two stones, this will be the new velocity of the hit stone.
                 Vector3 vectorBetween = otherStone.transform.position - gameObject.transform.position;
                 //Find the tangential distance between the velocity of the shooter and the vector between the stones.
@@ -80,10 +82,10 @@ public class Stone : MonoBehaviour {
                 float hitSize = velocity.magnitude * (1 - Mathf.Clamp01(tangDistance / vectorBetween.magnitude));
                 float shooterSize = velocity.magnitude * (Mathf.Clamp01(tangDistance / vectorBetween.magnitude));
 
-                float audioSize = hitSize / velocity.magnitude; //Will be between 0 and 1.
-
-                sources[1].volume = audioSize;
-                sources[1].Play();
+                audioSize = audioSize * hitSize / velocity.magnitude; //Will be between 0 and 1.
+                
+                sources[0].volume = audioSize;
+                sources[0].Play();
 
                 //Set velocities of the rigidbodies through the xCurl and zWeight attributes
                 velocity = shooterVector.normalized * shooterSize;
