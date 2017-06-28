@@ -8,7 +8,7 @@ public class DummySpawner : MonoBehaviour
     public DummyPooler[] poolers;
     
     // Use this for initialization
-    void Start()
+    protected virtual void Start()
     {
         StartCoroutine(ThrowStones());
     }
@@ -33,13 +33,15 @@ public class DummySpawner : MonoBehaviour
         }
 
     }
-    private void ThrowStone(DummyPooler pool)
+    protected Transform ThrowStone(DummyPooler pool)
     {
         DummyStone ds = pool.getStone();
         if (ds)
         {
             ds.transform.position = stoneSpawn.position;
             ds.gameObject.SetActive(true);
+            return ds.transform;
         }
+        return null;
     }
 }

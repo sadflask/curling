@@ -5,7 +5,7 @@ public class DummyStone : MonoBehaviour
     public float lastHit;
 
     //Flags to signal what state the stone is in
-    private bool isCurling;
+    protected bool isCurling;
 
     public Vector3 velocity;
 
@@ -19,7 +19,7 @@ public class DummyStone : MonoBehaviour
     private float drag;
 
     // Use this for initialization
-    void OnEnable()
+    protected virtual void OnEnable()
     {
         isCurling = true;
         //Give the stone a random weight and line and handle.

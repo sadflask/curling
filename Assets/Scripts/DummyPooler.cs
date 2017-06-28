@@ -6,12 +6,15 @@ public class DummyPooler : MonoBehaviour {
 
     public DummyStone stoneToMake;
 
+    [SerializeField]
+    private int numToMake;
+
     public List<DummyStone> stonePool;
 	// Use this for initialization
 
 	void Start () {
         stonePool = new List<DummyStone>();
-        for (int j = 0; j < 8; j++)
+        for (int j = 0; j < numToMake; j++)
         {
             //Make 8 stones and add them to the pool.
             DummyStone ds = Instantiate(stoneToMake, transform);
