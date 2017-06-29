@@ -258,6 +258,10 @@ public class UIController : MonoBehaviour {
     {
         SceneManager.LoadScene(0);
     }
+    public void ToTutorial()
+    {
+        SceneManager.LoadScene(5);
+    }
     public void Quit()
     {
         Application.Quit();

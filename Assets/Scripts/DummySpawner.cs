@@ -20,16 +20,16 @@ public class DummySpawner : MonoBehaviour
             for(int i=0;i<8;i++)
             {
                 
-                //Throw a stone from each team, 10-15 seconds apart
+                //Throw a stone from each team, 20-30 seconds apart
                 ThrowStone(poolers[0]);
-                yield return new WaitForSeconds(Random.Range(10.0f, 15.0f));
+                yield return new WaitForSeconds(Random.Range(20f, 30f));
                 ThrowStone(poolers[1]);
-                yield return new WaitForSeconds(Random.Range(10.0f, 15.0f));
+                yield return new WaitForSeconds(Random.Range(20f, 30f));
             }
             //Wait between ends
-            yield return new WaitForSeconds(60f);
             poolers[0].resetPool();
             poolers[1].resetPool();
+            yield return new WaitForSeconds(60f);
         }
 
     }

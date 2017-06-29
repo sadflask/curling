@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Tutorial : MonoBehaviour {
 
@@ -160,8 +161,9 @@ public class Tutorial : MonoBehaviour {
         text.text = fin;
         yield return new WaitForSeconds(3);
 
-        yield break;
-    }
+        SceneManager.LoadScene(0);
+    
+}
     void Update()
     {
         if (toFollow)
