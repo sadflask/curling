@@ -28,7 +28,7 @@ public class Tutorial : MonoBehaviour {
                     "The weight of the stone is referred to as to where it stops.",
                     "Where the stone can stop is divided into 10 zones, as shown here on the ice.",
                     "In addition to these zones, there are the 5 hit weights",
-                    "The 5 hit weights increase from hack (one that would stop where the hacks are behind the house) through to peel (a stone that is meant to move more than 1 stone).",
+                    "The 5 hit weights increase from Hack (a light hit) through to Peel (a very heavy one).",
                     "The last thing to know about weight is that the stone curls more at light weights, and less at high ones.",
                     "So if you want the stone to curl lots, you will have to throw it lighter." };
     private string[] line = { "Now we come to the line. The line of the stone determines where the stone will end up horizontally.",
@@ -59,14 +59,14 @@ public class Tutorial : MonoBehaviour {
         yield return new WaitForSeconds(4);
 
         text.text = aim[0];
-        yield return new WaitForSeconds(6);
+        yield return new WaitForSeconds(7);
         text.text = aim[1];
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(5);
         text.text = aim[2];
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(5);
 
         text.text = throwing[0];
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(5);
 
         //Disable the follow
         toFollow = null;
