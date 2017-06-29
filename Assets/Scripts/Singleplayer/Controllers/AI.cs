@@ -81,7 +81,7 @@ public abstract class AI : Player {
     //Draw to the other side of the house that the guard is on
     protected void DrawBehind()
     {
-        Draw(1.3f * -1 * Mathf.Sign(guard.transform.position.x));
+        Draw(1.6f * -1 * Mathf.Sign(guard.transform.position.x));
     }
     protected void Guard(Stone closestAIStone)
     {

@@ -15,7 +15,7 @@ public class NormalAI : AI {
             //If less than 2 up throw a guard
             if (score < 2)
             {
-                weight = (float)Weight.Two/1000f;
+                weight = (float)Weight.Two;
                 direction = 1.3f;
                 handle = -1;
             }
@@ -27,7 +27,7 @@ public class NormalAI : AI {
             //If more than 4 up throw it through
             else
             {
-                weight = (float)Weight.Control/1000f;
+                weight = (float)Weight.Control;
                 direction = 0.8f;
                 handle = -1;
             }
