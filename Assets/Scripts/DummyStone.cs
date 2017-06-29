@@ -23,7 +23,7 @@ public class DummyStone : MonoBehaviour
     {
         isCurling = true;
         //Give the stone a random weight and line and handle.
-        weight = Random.Range(3.91f,4.05f);
+        weight = Random.Range(2.1f, 2.3f);
         rotation = Random.Range(-1.8f, 1.8f);
         handle = (int) ( -1 * Mathf.Sign(rotation));
         transform.rotation = Quaternion.Euler(0,rotation,0);
@@ -98,7 +98,7 @@ public class DummyStone : MonoBehaviour
             velocity = new Vector3(curl, 0, velocity.z);
 
             //Subtract the drag from the current velocity.
-            drag = 20 * 0.0168f * Time.deltaTime / 11;
+            drag = 20 * 0.0168f * Time.deltaTime / 5.5f;
 
             if (velocity.magnitude < drag)
             {
@@ -111,10 +111,10 @@ public class DummyStone : MonoBehaviour
             //Spin the stone
             transform.rotation = Quaternion.Euler(new Vector3(0, transform.rotation.eulerAngles.y + handle, 0));
         }
-
+        else
         {
             float newSpeed;
-            drag = 20 * 0.0168f * Time.deltaTime / 11;
+            drag = 20 * 0.0168f * Time.deltaTime / 5.5f;
             newSpeed = velocity.magnitude - drag;
             velocity = velocity.normalized * newSpeed;
 
