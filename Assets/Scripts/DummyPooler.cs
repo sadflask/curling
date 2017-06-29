@@ -27,9 +27,12 @@ public class DummyPooler : MonoBehaviour {
     {
         foreach (DummyStone ds in stonePool)
         {
-            if (!ds.gameObject.activeSelf)
+            if (ds)
             {
-                return ds;
+                if (!ds.gameObject.activeSelf)
+                {
+                    return ds;
+                }
             }
         }
         //Should never happen in this case.

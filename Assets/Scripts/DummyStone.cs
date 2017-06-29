@@ -85,42 +85,41 @@ public class DummyStone : MonoBehaviour
         if (isCurling)
         {
             //Make the stone curl more at lower speeds
-            if (velocity.magnitude > 3)
+            if (velocity.magnitude > 1)
             {
-                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (20 - velocity.magnitude) / 2500), -2, 2);
+                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 2500), -2, 2);
             }
             else
             {
-                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (20 - velocity.magnitude) / 1500), -2, 2);
+                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 1500), -2, 2);
             }
 
             //Add the curl on to the current velocity.
             velocity = new Vector3(curl, 0, velocity.z);
 
             //Subtract the drag from the current velocity.
-            drag = Time.deltaTime * (10 - velocity.magnitude) / 35;
+            drag = 20 * 0.0168f * Time.deltaTime / 11;
 
-            velocity -= drag * velocity.normalized;
-
-            if (velocity.magnitude < 0.02)
+            if (velocity.magnitude < drag)
             {
                 isCurling = false;
             }
             else
             {
-                //Spin the stone
-                transform.rotation = Quaternion.Euler(new Vector3(0, transform.rotation.eulerAngles.y + handle, 0));
+                velocity -= drag * velocity.normalized;
             }
+            //Spin the stone
+            transform.rotation = Quaternion.Euler(new Vector3(0, transform.rotation.eulerAngles.y + handle, 0));
         }
-        else
+
         {
             float newSpeed;
-            drag = Time.deltaTime * (20 - velocity.magnitude) / 80;
+            drag = 20 * 0.0168f * Time.deltaTime / 11;
             newSpeed = velocity.magnitude - drag;
             velocity = velocity.normalized * newSpeed;
 
             //When the stone stops
-            if (newSpeed < 0.01)
+            if (velocity.magnitude < drag)
             {
                 velocity = Vector3.zero;
             }
