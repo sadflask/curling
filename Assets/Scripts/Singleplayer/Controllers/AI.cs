@@ -89,11 +89,11 @@ public abstract class AI : Player {
         float line;
         if (closestAIStone.transform.position.x < 0)
         {
-            line = closestAIStone.transform.position.x - 0.8f + (0.5f * (-closestAIStone.transform.position.x / 1.9f));
+            line = closestAIStone.transform.position.x - 1.0f;
         }
         else
         {
-            line = closestAIStone.transform.position.x + 0.8f - (0.5f * (closestAIStone.transform.position.x / 1.9f));
+            line = closestAIStone.transform.position.x + 1.0f;
         }
 
         Vector3 toThrowAlong = new Vector3(line, 0, (17.375f + 20.75f));
@@ -110,11 +110,11 @@ public abstract class AI : Player {
         float line;
         if (closestP1Stone.transform.position.x < 0)
         {
-            line = closestP1Stone.transform.position.x - 0.4f;
+            line = closestP1Stone.transform.position.x - 0.5f;
         }
         else
         {
-            line = closestP1Stone.transform.position.x + 0.4f;
+            line = closestP1Stone.transform.position.x + 0.5f;
         }
         
         Vector3 toThrowAlong = new Vector3(line, 0, (17.375f + 20.75f));
@@ -134,11 +134,11 @@ public abstract class AI : Player {
             //If the guard is inside the stone hit outside
             if (guard.transform.position.x > closestP1Stone.transform.position.x)
             {
-                line = closestP1Stone.transform.position.x - 0.4f + (0.5f * (-closestP1Stone.transform.position.x / 1.9f));
+                line = closestP1Stone.transform.position.x - 0.5f;
                 handle = 1;
             } else
             {
-                line = closestP1Stone.transform.position.x + 0.6f + (0.5f * (-closestP1Stone.transform.position.x / 1.9f));
+                line = closestP1Stone.transform.position.x + 0.5f;
                 handle = -1;
             }
         }
@@ -146,11 +146,11 @@ public abstract class AI : Player {
         {
             if (guard.transform.position.x < closestP1Stone.transform.position.x)
             {
-                line = closestP1Stone.transform.position.x + 0.4f - (0.5f * (closestP1Stone.transform.position.x / 1.9f));
+                line = closestP1Stone.transform.position.x + 0.5f;
                  handle = -1;
             } else
             {
-                line = closestP1Stone.transform.position.x - 0.6f - (0.5f * (closestP1Stone.transform.position.x / 1.9f));
+                line = closestP1Stone.transform.position.x - 0.5f;
                 handle = 1;
             }
         }
