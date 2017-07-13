@@ -121,7 +121,7 @@ public class Stone : MonoBehaviour {
             //Make the stone curl more at lower speeds
             if (velocity.magnitude > 1)
             {
-                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 2500), -2, 2);
+                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 2000), -2, 2);
             }
             else
             {
