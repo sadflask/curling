@@ -43,30 +43,27 @@ public class WeightTester : DummyStone
                 //Get the vector that the shooter will travel along using the cross product. If this is greater than 90 degrees 
                 //away from the initial velocity then reverse it.
                 Vector3 shooterVector = Vector3.Cross(vectorBetween, Vector3.up);
-                if (Vector3.Angle(shooterVector, velocity) > 90)
+
+                //Find theta, the angle between the velocity and shooterVector
+                float theta = Vector3.Angle(shooterVector, velocity);
+                if (theta > 90)
                 {
                     shooterVector *= -1;
+                    theta = Vector3.Angle(shooterVector, velocity);
                 }
 
-                //Set the sizes of the velocities
-                float hitSize = velocity.magnitude * (1 - Mathf.Clamp01(tangDistance / vectorBetween.magnitude));
-                float shooterSize = velocity.magnitude * (Mathf.Clamp01(tangDistance / vectorBetween.magnitude));
-
-                //Draw debug lines
-                Debug.DrawLine(transform.position + Vector3.up, transform.position + shooterVector.normalized * shooterSize + Vector3.up, Color.red);
-                Debug.DrawLine(otherStone.transform.position + Vector3.up, otherStone.transform.position + vectorBetween.normalized * hitSize + Vector3.up, Color.red);
-
-                shooterSize /= 1.1f;
-                hitSize *= 1.1f;
+                //The shooter velocity should be found by velocity(initial) * cos (theta) due to conservation of momentum.
+                float shooterSize = velocity.magnitude * Mathf.Cos(Mathf.Deg2Rad * theta);
+                float hitSize = velocity.magnitude * Mathf.Sin(Mathf.Deg2Rad * theta);
 
                 audioSize = audioSize * hitSize / velocity.magnitude; //Will be between 0 and 1.
                 
-
-
                 //Draw debug lines
                 Debug.DrawLine(transform.position + Vector3.up, transform.position + shooterVector.normalized * shooterSize + Vector3.up, Color.green);
                 Debug.DrawLine(otherStone.transform.position + Vector3.up, otherStone.transform.position + vectorBetween.normalized * hitSize + Vector3.up, Color.green);
-                
+
+                //Pause
+                //Time.timeScale = 0.0f;
 
                 velocity = shooterVector.normalized * shooterSize;
 
