@@ -81,7 +81,7 @@ public abstract class AI : Player {
     //Draw to the other side of the house that the guard is on
     protected void DrawBehind()
     {
-        Draw(1.6f * -1 * Mathf.Sign(guard.transform.position.x));
+        Draw(1.5f * -1 * Mathf.Sign(guard.transform.position.x));
     }
     protected void Guard(Stone closestAIStone)
     {
@@ -110,11 +110,11 @@ public abstract class AI : Player {
         float line;
         if (closestP1Stone.transform.position.x < 0)
         {
-            line = closestP1Stone.transform.position.x - 0.5f;
+            line = closestP1Stone.transform.position.x - 0.35f;
         }
         else
         {
-            line = closestP1Stone.transform.position.x + 0.5f;
+            line = closestP1Stone.transform.position.x + 0.35f;
         }
         
         Vector3 toThrowAlong = new Vector3(line, 0, (17.375f + 20.75f));
@@ -134,11 +134,11 @@ public abstract class AI : Player {
             //If the guard is inside the stone hit outside
             if (guard.transform.position.x > closestP1Stone.transform.position.x)
             {
-                line = closestP1Stone.transform.position.x - 0.5f;
+                line = closestP1Stone.transform.position.x - 0.35f;
                 handle = 1;
             } else
             {
-                line = closestP1Stone.transform.position.x + 0.5f;
+                line = closestP1Stone.transform.position.x + 0.35f;
                 handle = -1;
             }
         }
@@ -146,11 +146,11 @@ public abstract class AI : Player {
         {
             if (guard.transform.position.x < closestP1Stone.transform.position.x)
             {
-                line = closestP1Stone.transform.position.x + 0.5f;
+                line = closestP1Stone.transform.position.x + 0.35f;
                  handle = -1;
             } else
             {
-                line = closestP1Stone.transform.position.x - 0.5f;
+                line = closestP1Stone.transform.position.x - 0.35f;
                 handle = 1;
             }
         }
