@@ -6,21 +6,21 @@ namespace Curling
 
     public enum Weight
     {
-        One = 2000,
-        Two = 2050,
+        One = 1980,
+        Two = 2020,
         Three = 2090,
-        Four = 2115,
-        Five = 2133,
-        Six = 2148,
-        Seven = 2158,
-        Eight = 2168,
-        Nine = 2183,
-        Ten = 2200,
-        Hack = 2250,
-        Board = 2300,
-        Control = 2400,
-        Normal = 2500,
-        Peel = 2600
+        Four = 2130,
+        Five = 2155,
+        Six = 2175,
+        Seven = 2190,
+        Eight = 2205,
+        Nine = 2225,
+        Ten = 2250,
+        Hack = 2310,
+        Board = 2400,
+        Control = 2500,
+        Normal = 2650,
+        Peel = 2800
     }
     public enum State
     {

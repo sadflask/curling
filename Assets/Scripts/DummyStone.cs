@@ -6,6 +6,7 @@ public class DummyStone : MonoBehaviour
 
     //Flags to signal what state the stone is in
     protected bool isCurling;
+    private bool released;
 
     public Vector3 velocity;
 
@@ -35,6 +36,10 @@ public class DummyStone : MonoBehaviour
         {
             //HIDE SELF
             gameObject.SetActive(false);
+        }
+        else if (other.CompareTag("FirstHog"))
+        {
+            released = true;
         }
     }
     void OnCollisionEnter(Collision c)
@@ -80,6 +85,7 @@ public class DummyStone : MonoBehaviour
     }
 
     // Update is called once per frame
+    // Update is called once per frame
     void FixedUpdate()
     {
         if (isCurling)
@@ -94,11 +100,19 @@ public class DummyStone : MonoBehaviour
                 curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 1500), -2, 2);
             }
 
+            if (released)
+            {
+                //Subtract the drag from the current velocity.
+                drag = 20 * 0.0168f * Time.deltaTime / 4;
+            }
+            else
+            {
+                drag = 0;
+                curl = velocity.x;
+            }
+
             //Add the curl on to the current velocity.
             velocity = new Vector3(curl, 0, velocity.z);
-
-            //Subtract the drag from the current velocity.
-            drag = 20 * 0.0168f * Time.deltaTime / 5.5f;
 
             if (velocity.magnitude < drag)
             {
@@ -114,7 +128,7 @@ public class DummyStone : MonoBehaviour
         else
         {
             float newSpeed;
-            drag = 20 * 0.0168f * Time.deltaTime / 5.5f;
+            drag = 20 * 0.0168f * Time.deltaTime / 4;
             newSpeed = velocity.magnitude - drag;
             velocity = velocity.normalized * newSpeed;
 

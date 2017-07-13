@@ -9,6 +9,7 @@ public class Stone : MonoBehaviour {
     private bool isFreeGuard;
     private bool isCurling;
     private bool passedHog;
+    private bool released;
     public Vector3 lastPosition;
 
     public Vector3 velocity;
@@ -41,7 +42,8 @@ public class Stone : MonoBehaviour {
             //HIDE SELF
             velocity = Vector3.zero;
             gameObject.transform.position = new Vector3(5, -1, 18);
-        } else if (other.CompareTag("CameraProc"))
+        }
+        else if (other.CompareTag("CameraProc"))
         {
             //Change player position;
             if (gc.gState.players[playerIndex])
@@ -50,6 +52,10 @@ public class Stone : MonoBehaviour {
                 gc.gState.players[playerIndex].transform.rotation = gc.gState.topPosition.transform.rotation;
             }
             passedHog = true;
+        }
+        else if (other.CompareTag("FirstHog"))
+        {
+            released = true;
         }
     }
     void OnCollisionEnter(Collision c) {
@@ -119,14 +125,21 @@ public class Stone : MonoBehaviour {
             }
             else
             {
-                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 1500), -2, 2);
+                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 1000), -2, 2);
+            }
+
+            if (released)
+            {
+                //Subtract the drag from the current velocity.
+                drag = 20 * 0.0168f * Time.deltaTime / 4;
+            } else
+            {
+                drag = 0;
+                curl = velocity.x;
             }
 
             //Add the curl on to the current velocity.
             velocity = new Vector3(curl, 0, velocity.z);
-
-            //Subtract the drag from the current velocity.
-            drag = 20 * 0.0168f * Time.deltaTime / 5.5f;
 
             if (velocity.magnitude < drag)
             {
@@ -142,7 +155,7 @@ public class Stone : MonoBehaviour {
         else 
         {
             float newSpeed;
-            drag = 20 * 0.0168f * Time.deltaTime / 5.5f;
+            drag = 20 * 0.0168f * Time.deltaTime / 4;
             newSpeed = velocity.magnitude - drag;
             velocity = velocity.normalized * newSpeed;
 

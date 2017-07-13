@@ -132,6 +132,7 @@ public class Tutorial : MonoBehaviour {
         text.text = weight[6];
         yield return new WaitForSeconds(3);
 
+        //TODO FROM HERE
         text.text = line[0];
         yield return new WaitForSeconds(3);
         text.text = line[1];
