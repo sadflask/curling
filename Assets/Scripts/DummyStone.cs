@@ -24,7 +24,7 @@ public class DummyStone : MonoBehaviour
     {
         isCurling = true;
         //Give the stone a random weight and line and handle.
-        weight = Random.Range(2.1f, 2.3f);
+        weight = Random.Range(2.13f, 2.4f);
         rotation = Random.Range(-1.8f, 1.8f);
         handle = (int) ( -1 * Mathf.Sign(rotation));
         transform.rotation = Quaternion.Euler(0,rotation,0);
