@@ -42,9 +42,15 @@ public class UIController : MonoBehaviour {
             {
                 case "Result":
                     if (won)
+                    {
                         t.text = "VICTORY!";
+                        PlayerData.instance.AddGame(true);
+                    }
                     else
+                    {
                         t.text = "DEFEAT";
+                        PlayerData.instance.AddGame(false);
+                    }
                     break;
                 case "End":
                     t.text = (ends).ToString();
@@ -54,6 +60,11 @@ public class UIController : MonoBehaviour {
                     break;
                 case "Opponent Score":
                     t.text = secondPlayerScore.ToString();
+                    break;
+                case "Win Rate":
+                    float wins = PlayerData.instance.GetWins();
+                    float games = PlayerData.instance.GetGames();
+                    t.text = wins + "/" + games + " (" + (int)(wins/games*100) + "%)";
                     break;
             }
         }
