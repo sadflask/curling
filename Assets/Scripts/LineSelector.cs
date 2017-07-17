@@ -13,6 +13,11 @@ public class LineSelector : MonoBehaviour
     public float currentLine;
     public GameController gc;
 	
+    void OnEnable()
+    {
+        selected = false;
+        line.GetComponent<MeshRenderer>().material = selecting;
+    }
 	// Update is called once per frame
 	void Update () {
         if (Input.mousePosition.y < Screen.height/4)
@@ -46,7 +51,7 @@ public class LineSelector : MonoBehaviour
         else
         {
             //Change colour to red
-            line.GetComponent<MeshRenderer>().material = selecting; ;
+            line.GetComponent<MeshRenderer>().material = selecting;
         }
     }
 }
