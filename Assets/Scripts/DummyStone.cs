@@ -29,6 +29,7 @@ public class DummyStone : MonoBehaviour
         handle = (int) ( -1 * Mathf.Sign(rotation));
         transform.rotation = Quaternion.Euler(0,rotation,0);
         velocity = weight * transform.forward;
+        released = false;
     }
     void OnTriggerEnter(Collider other)
     {
@@ -83,8 +84,7 @@ public class DummyStone : MonoBehaviour
             }
         }
     }
-
-    // Update is called once per frame
+    
     // Update is called once per frame
     void FixedUpdate()
     {
@@ -93,11 +93,11 @@ public class DummyStone : MonoBehaviour
             //Make the stone curl more at lower speeds
             if (velocity.magnitude > 1)
             {
-                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 2500), -2, 2);
+                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 2000), -2, 2);
             }
             else
             {
-                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 1500), -2, 2);
+                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 1000), -2, 2);
             }
 
             if (released)

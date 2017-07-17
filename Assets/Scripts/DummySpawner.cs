@@ -21,6 +21,7 @@ public class DummySpawner : MonoBehaviour
             {
                 
                 //Throw a stone from each team, 20-30 seconds apart
+
                 ThrowStone(poolers[0]);
                 yield return new WaitForSeconds(Random.Range(20f, 30f));
                 ThrowStone(poolers[1]);
