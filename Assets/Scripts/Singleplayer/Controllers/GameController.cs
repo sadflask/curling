@@ -105,7 +105,20 @@ public class GameController : MonoBehaviour {
         //Display win/loss message
         ui.FinishedGame(gState.ends, sc.firstPlayerScore, sc.secondPlayerScore, sc.firstPlayerScore > sc.secondPlayerScore);
     }
-
+    public bool SweepStone(bool sweep, Player p)
+    {
+        if (gState.currentStone == null)
+            return false;
+        if (p.Equals(gState.players[gState.currentStone.playerIndex]))
+        {
+            gState.currentStone.isBeingSwept = sweep;
+        }
+        else
+        {
+            Debug.Log("TRYING TO SWEEP OPPOSITION STONE");
+        }
+        return gState.currentStone.isBeingSwept;
+    }
     void DisplayMessage()
     {
         ui.endCanvas.gameObject.SetActive(true);
