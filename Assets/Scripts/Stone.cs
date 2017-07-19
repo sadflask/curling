@@ -11,6 +11,7 @@ public class Stone : MonoBehaviour {
     private bool passedHog;
     private bool released;
     public Vector3 lastPosition;
+    public bool isBeingSwept;
 
     public Vector3 velocity;
 
@@ -118,18 +119,18 @@ public class Stone : MonoBehaviour {
                 //Move camera to stone
                 if (gc.gState.players[playerIndex])
                 {
-                    gc.gState.players[playerIndex].transform.position = new Vector3(0, 2, transform.position.z - 3.5f);
+                    gc.gState.players[playerIndex].transform.position = new Vector3(0, 1.7f, transform.position.z -2);
                     gc.gState.players[playerIndex].transform.rotation = gc.gState.stonePosition.transform.rotation;
                 }
             }
             //Make the stone curl more at lower speeds
             if (velocity.magnitude > 1)
             {
-                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 2000), -2, 2);
+                curl = handle * Time.deltaTime * (10 - velocity.magnitude) / 2000;
             }
             else
             {
-                curl = Mathf.Clamp(velocity.x + (handle * Time.deltaTime * (10 - velocity.magnitude) / 1000), -2, 2);
+                curl = handle * Time.deltaTime * (10 - velocity.magnitude) / 1000;
             }
 
             if (released)
@@ -139,11 +140,16 @@ public class Stone : MonoBehaviour {
             } else
             {
                 drag = 0;
-                curl = velocity.x;
+                curl = 0;
+            }
+            if (isBeingSwept)
+            {
+                drag *= 0.95f;
+                curl *= 0.80f;
             }
 
             //Add the curl on to the current velocity.
-            velocity = new Vector3(curl, 0, velocity.z);
+            velocity = new Vector3(curl + velocity.x, 0, velocity.z);
 
             if (velocity.magnitude < drag)
             {
