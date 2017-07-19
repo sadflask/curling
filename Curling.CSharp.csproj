@@ -88,6 +88,7 @@
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
     <Compile Include="Assets\Scripts\ConfigData.cs" />
     <Compile Include="Assets\Scripts\ConfigUI.cs" />
+    <Compile Include="Assets\Scripts\DummyPooler.cs" />
     <Compile Include="Assets\Scripts\DummySpawner.cs" />
     <Compile Include="Assets\Scripts\DummyStone.cs" />
     <Compile Include="Assets\Scripts\EndSceneTransition.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Assets\Scripts\LineSelector.cs" />
     <Compile Include="Assets\Scripts\Logger.cs" />
     <Compile Include="Assets\Scripts\PassNPlayer\PNPGameController.cs" />
+    <Compile Include="Assets\Scripts\PlayerData.cs" />
     <Compile Include="Assets\Scripts\Score.cs" />
     <Compile Include="Assets\Scripts\Singleplayer\Controllers\AI.cs" />
     <Compile Include="Assets\Scripts\Singleplayer\Controllers\GameController.cs" />
@@ -105,6 +107,11 @@
     <Compile Include="Assets\Scripts\Singleplayer\Controllers\UIController.cs" />
     <Compile Include="Assets\Scripts\Stone.cs" />
     <Compile Include="Assets\Scripts\StonePooler.cs" />
+    <Compile Include="Assets\Scripts\Sweeper.cs" />
+    <Compile Include="Assets\Scripts\Tutorial.cs" />
+    <Compile Include="Assets\Scripts\TutorialSpawner.cs" />
+    <Compile Include="Assets\Scripts\TutorialStone.cs" />
+    <Compile Include="Assets\Scripts\WeightTester.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

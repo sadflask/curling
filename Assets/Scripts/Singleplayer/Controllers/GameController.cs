@@ -112,6 +112,10 @@ public class GameController : MonoBehaviour {
         if (p.Equals(gState.players[gState.currentStone.playerIndex]))
         {
             gState.currentStone.isBeingSwept = sweep;
+            if (sweep)
+                gState.players[gState.currentStone.playerIndex].Sweep();
+            else
+                gState.players[gState.currentStone.playerIndex].StopSweep();
         }
         else
         {
@@ -159,14 +163,13 @@ public class GameController : MonoBehaviour {
                 //Do nothing
                 yield return null;
             }
-
             //Wait
             yield return new WaitForSeconds(timeout);
 
             //Switch throwers;
             ui.HideIcon(gState.throwingPlayerIndex, i);
             gState.throwingPlayerIndex = 1 - gState.throwingPlayerIndex;
-            
+            gState.players[1 - gState.throwingPlayerIndex].StopSweep();
             
             //Reset current stone to null
             gState.currentStone = null;

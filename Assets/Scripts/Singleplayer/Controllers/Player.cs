@@ -47,10 +47,18 @@ public abstract class Player : MonoBehaviour {
     public GameController gc;
     public GameState gs;
 
+    public AudioSource sweepNoise;
     public Camera cam;
 
     public abstract void DecideOnShot();
-
+    public void Sweep()
+    {
+        sweepNoise.Play();
+    }
+    public void StopSweep()
+    {
+        sweepNoise.Stop();
+    }
     public void Start()
     {
         gs = gc.gState;
