@@ -44,16 +44,24 @@ public abstract class Player : MonoBehaviour {
     
     public Curling.State state;
 
-    public GameController gc;
-    public GameState gs;
+    public GameController gameController;
+    public GameState gameState;
 
+    public AudioSource sweepNoise;
     public Camera cam;
 
     public abstract void DecideOnShot();
-
+    public void Sweep()
+    {
+        sweepNoise.Play();
+    }
+    public void StopSweep()
+    {
+        sweepNoise.Stop();
+    }
     public void Start()
     {
-        gs = gc.gState;
+        gameState = gameController.gameState;
     }
     public void DisableCam()
     {
@@ -67,11 +75,11 @@ public abstract class Player : MonoBehaviour {
 
     public void Throw()
     {
-        ThrowStone(handle, (float)weight, direction, playerIndex);
+        ThrowStone(handle, weight, direction, playerIndex);
     }
     public void ThrowStone(int handle, float weight, float direction, int playerIndex)
     {
-        gc.ThrowStone(handle, weight, direction, playerIndex);
+        gameController.ThrowStone(handle, weight, direction, playerIndex);
     }
 
     public void ChangeState(Curling.State s)
@@ -82,7 +90,7 @@ public abstract class Player : MonoBehaviour {
     {
         stoneColorIndex = config.colourIndices[playerIndex];
         teamName = config.teamNames[playerIndex];
-        gc.playersReady++;
+        gameController.playersReady++;
     }
 
     void Update()
@@ -90,6 +98,9 @@ public abstract class Player : MonoBehaviour {
         if (state == Curling.State.Ready)
         {
             DecideOnShot();
+            gameController.userInterface.SetHandle(handle);
+            gameController.userInterface.SetWeight(weight.ToString());
+            Throw();
             ChangeState(Curling.State.Choosing);
         }
         else if (state == Curling.State.Passive)
@@ -100,7 +111,7 @@ public abstract class Player : MonoBehaviour {
     }
     public void GoToSkip()
     {
-        transform.position = gc.gState.skipPosition.transform.position;
-        transform.rotation = gc.gState.skipPosition.transform.rotation;
+        transform.position = gameController.gameState.skipPosition.transform.position;
+        transform.rotation = gameController.gameState.skipPosition.transform.rotation;
     }
 }

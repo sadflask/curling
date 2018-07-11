@@ -118,7 +118,7 @@ public class UIController : MonoBehaviour {
     }
     public void ConfirmWeight()
     {
-        if (gc.gState.players[gc.gState.throwingPlayerIndex].weight == 0)
+        if (gc.gameState.players[gc.gameState.throwingPlayerIndex].weight == 0)
         {
             //Popup about how user can't do that
             SetWeight("Seven");
@@ -127,7 +127,7 @@ public class UIController : MonoBehaviour {
         {
             weightCanvas.gameObject.SetActive(false);
             line.SetActive(true);
-            SetCanvasCamera(lineCanvas, gc.gState.players[gc.gState.throwingPlayerIndex].cam);
+            SetCanvasCamera(lineCanvas, gc.gameState.players[gc.gameState.throwingPlayerIndex].cam);
             lineCanvas.gameObject.SetActive(true);
         }
     }
@@ -137,7 +137,7 @@ public class UIController : MonoBehaviour {
         line.SetActive(false);
         lineCanvas.GetComponentInChildren<LineSelector>().ToggleSelected();
         lineCanvas.GetComponentInChildren<LineSelector>().selected = false;
-        SetCanvasCamera(handleCanvas, gc.gState.players[gc.gState.throwingPlayerIndex].cam);
+        SetCanvasCamera(handleCanvas, gc.gameState.players[gc.gameState.throwingPlayerIndex].cam);
         handleCanvas.gameObject.SetActive(true);
     }
     public void SetWeight(string weight)
@@ -239,23 +239,23 @@ public class UIController : MonoBehaviour {
     public void ConfirmHandle()
     {
         handleCanvas.gameObject.SetActive(false);
-        gc.gState.players[gc.gState.throwingPlayerIndex].Throw();
+        gc.gameState.players[gc.gameState.throwingPlayerIndex].Throw();
     }
     public void ToNextEnd()
     {
         scoreboard.gameObject.SetActive(false);
         gc.ready = true;
         InitIconColours();
-        if (gc.gState.currentEnd == 1)
+        if (gc.gameState.currentEnd == 1)
             endText.text = "2nd End";
-        else if (gc.gState.currentEnd == 2)
+        else if (gc.gameState.currentEnd == 2)
             endText.text = "3rd End";
-        else if (gc.gState.currentEnd == 3)
+        else if (gc.gameState.currentEnd == 3)
             endText.text = "4th End";
-        else if (gc.gState.currentEnd == 10)
+        else if (gc.gameState.currentEnd == 10)
             endText.text = "Finished";
         else
-            endText.text = (gc.gState.currentEnd + 1).ToString() + "th End";
+            endText.text = (gc.gameState.currentEnd + 1).ToString() + "th End";
     }
     public void ToGameOptions()
     {
@@ -311,8 +311,8 @@ public class UIController : MonoBehaviour {
     {
         for (int i = 0; i < 8; i++)
         {
-            firstPlayerIcons[i].color = gc.gState.stoneColours[gc.gState.players[0].stoneColorIndex];
-            secondPlayerIcons[i].color = gc.gState.stoneColours[gc.gState.players[1].stoneColorIndex];
+            firstPlayerIcons[i].color = gc.gameState.stoneColours[gc.gameState.players[0].stoneColorIndex];
+            secondPlayerIcons[i].color = gc.gameState.stoneColours[gc.gameState.players[1].stoneColorIndex];
         }
     }
     public void UpdatePlayerScore(int playerIndex, int score, int end)

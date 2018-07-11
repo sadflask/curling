@@ -8,11 +8,11 @@ public class GameController : MonoBehaviour {
     public int timeout;
 
     [SerializeField]
-    public GameState gState;
+    public GameState gameState;
     
-    public Score sc;
+    public ScoreHelper scoreHelper;
 
-    public UIController ui;
+    public UIController userInterface;
 
     public bool ready;
     public int playersReady;
@@ -23,51 +23,51 @@ public class GameController : MonoBehaviour {
         {
             playersReady = 0;
             //Change the stone icons and title colours
-            ui.InitIconColours();
+            userInterface.InitIconColours();
             for (int i = 0; i < 2; i++)
             {
-                ui.playerNames[i].color = gState.stoneColours[gState.players[i].stoneColorIndex];
-                ui.playerNames[i].text = gState.players[i].teamName.ToUpper();
-                ui.scoreboardNames[i].text = gState.players[i].teamName.ToUpper();
-                ui.scoreCanvasNames[i].text = gState.players[i].teamName.ToUpper();
+                userInterface.playerNames[i].color = gameState.stoneColours[gameState.players[i].stoneColorIndex];
+                userInterface.playerNames[i].text = gameState.players[i].teamName.ToUpper();
+                userInterface.scoreboardNames[i].text = gameState.players[i].teamName.ToUpper();
+                userInterface.scoreCanvasNames[i].text = gameState.players[i].teamName.ToUpper();
             }
 
             timeout = 2;
 
-            gState.currentEnd = 0;
-            sc = new Score();
+            gameState.currentEnd = 0;
+            scoreHelper = new ScoreHelper();
             StartCoroutine(Throws());
         }
     }
 
     public void SetPlayerWeight(float weight)
     {
-        gState.players[0].weight = weight;
-        gState.players[1].weight = weight;
+        gameState.players[0].weight = weight;
+        gameState.players[1].weight = weight;
     }
-    public void SetPlayerDirection(float dir)
+    public void SetPlayerDirection(float direction)
     {
-        gState.players[gState.throwingPlayerIndex].direction = dir;
+        gameState.players[gameState.throwingPlayerIndex].direction = direction;
     }
     public void SetPlayerHandle(int handle)
     {
-        gState.players[0].handle = handle;
-        gState.players[1].handle = handle;
+        gameState.players[0].handle = handle;
+        gameState.players[1].handle = handle;
     }
     
     public void ThrowStone(int handle, float weight, float direction, int playerIndex)
     {
-        GameObject toThrow = gState.playerStones[gState.players[playerIndex].stoneColorIndex];
+        GameObject toThrow = gameState.playerStones[gameState.players[playerIndex].stoneColorIndex];
 
         Stone stone = Instantiate(toThrow).GetComponent<Stone>();
         stone.weight = weight / 1000f;
         stone.transform.rotation = Quaternion.Euler(0.0f, direction, 0.0f);
         stone.handle = handle;
-        stone.playerIndex = gState.throwingPlayerIndex;
-        gState.currentStone = stone;
-        gState.stones[gState.stonesThrown] = stone;
-        stone.canvas = ui.scoreCanvas;
-        stone.gc = this;
+        stone.playerIndex = gameState.throwingPlayerIndex;
+        gameState.currentStone = stone;
+        gameState.stones[gameState.stonesThrown] = stone;
+        stone.canvas = userInterface.scoreCanvas;
+        stone.gameController = this;
         return;
     }
     
@@ -84,92 +84,108 @@ public class GameController : MonoBehaviour {
             yield return new WaitForSeconds(0.01f);
         }
         yield return new WaitForSeconds(1);*/
-        ui.FinishedIntro();
+        userInterface.FinishedIntro();
 
-        gState.stonesThrown = 0;
-        for (gState.currentEnd = 1; gState.currentEnd < gState.ends + 1; gState.currentEnd++)
+        gameState.stonesThrown = 0;
+        for (gameState.currentEnd = 1; gameState.currentEnd < gameState.ends + 1; gameState.currentEnd++)
         {
             StartCoroutine(PlayEnd());
             ready = false;
             yield return new WaitUntil(() => ready);
         }
         //End of game unless scores tied
-        if (sc.firstPlayerScore == sc.secondPlayerScore)
+        if (scoreHelper.firstPlayerScore == scoreHelper.secondPlayerScore)
         {
             //Play another end
             StartCoroutine(PlayEnd());
             ready = false;
             yield return new WaitUntil(() => ready);
         }
-        ui.scoreCanvas.gameObject.SetActive(false);
+        userInterface.scoreCanvas.gameObject.SetActive(false);
         //Display win/loss message
-        ui.FinishedGame(gState.ends, sc.firstPlayerScore, sc.secondPlayerScore, sc.firstPlayerScore > sc.secondPlayerScore);
+        userInterface.FinishedGame(gameState.ends, scoreHelper.firstPlayerScore, scoreHelper.secondPlayerScore, scoreHelper.firstPlayerScore > scoreHelper.secondPlayerScore);
     }
-
+    public bool SweepStone(bool sweep, Player p)
+    {
+        if (gameState.currentStone == null)
+            return false;
+        if (p.Equals(gameState.players[gameState.currentStone.playerIndex]))
+        {
+            gameState.currentStone.isBeingSwept = sweep;
+            if (sweep)
+                gameState.players[gameState.currentStone.playerIndex].Sweep();
+            else
+                gameState.players[gameState.currentStone.playerIndex].StopSweep();
+        }
+        else
+        {
+            Debug.Log("TRYING TO SWEEP OPPOSITION STONE");
+        }
+        return gameState.currentStone.isBeingSwept;
+    }
     void DisplayMessage()
     {
-        ui.endCanvas.gameObject.SetActive(true);
+        userInterface.endCanvas.gameObject.SetActive(true);
     }
     protected void CleanUp()
     {
-        gState.stonesThrown = 0;
-        foreach (Stone s in gState.stones)
+        gameState.stonesThrown = 0;
+        foreach (Stone s in gameState.stones)
         {
             Destroy(s.gameObject);
         }
-        gState.stones = new Stone[16];
+        gameState.stones.Clear();
     }
     protected IEnumerator PlayEnd()
     {
         //Play one end
-        ui.endCanvas.gameObject.SetActive(true);
-        ui.endCanvas.GetComponentInChildren<Text>().text = ui.endText.text;
+        userInterface.endCanvas.gameObject.SetActive(true);
+        userInterface.endCanvas.GetComponentInChildren<Text>().text = userInterface.endText.text;
         yield return new WaitForSeconds(2.0f);
-        ui.endCanvas.gameObject.SetActive(false);
+        userInterface.endCanvas.gameObject.SetActive(false);
         for (int i = 0; i < 16; i++)
         {
             //Change the colour of the icons
-            ui.ChangeIcon(gState.throwingPlayerIndex, i);
-            gState.players[gState.throwingPlayerIndex].ChangeState(Curling.State.Ready);
-            gState.players[1-gState.throwingPlayerIndex].ChangeState(Curling.State.Passive);
+            userInterface.ChangeIcon(gameState.throwingPlayerIndex, i);
+            gameState.players[gameState.throwingPlayerIndex].ChangeState(Curling.State.Ready);
+            gameState.players[1-gameState.throwingPlayerIndex].ChangeState(Curling.State.Passive);
             
             //Wait until the user throws the stone
-            while (gState.currentStone == null)
+            while (gameState.currentStone == null)
             {
                 //Do nothing
                 yield return null;
             }
-            gState.stonesThrown++;
+            gameState.stonesThrown++;
             //Wait until the stone stops to do anything else
-            while (gState.currentStone.velocity != Vector3.zero)
+            while (gameState.currentStone.velocity != Vector3.zero)
             {
                 //Do nothing
                 yield return null;
             }
-
             //Wait
             yield return new WaitForSeconds(timeout);
 
             //Switch throwers;
-            ui.HideIcon(gState.throwingPlayerIndex, i);
-            gState.throwingPlayerIndex = 1 - gState.throwingPlayerIndex;
-            
+            userInterface.HideIcon(gameState.throwingPlayerIndex, i);
+            gameState.throwingPlayerIndex = 1 - gameState.throwingPlayerIndex;
+            gameState.players[1 - gameState.throwingPlayerIndex].StopSweep();
             
             //Reset current stone to null
-            gState.currentStone = null;
+            gameState.currentStone = null;
         }
         yield return new WaitForSeconds(3);
 
         //Calculate who scored
-        sc.CalculateScore(GetComponent<GameController>());
+        scoreHelper.CalculateScore(GetComponent<GameController>());
         CleanUp();
 
-        ui.endsTitle.text = "Score after " + gState.currentEnd.ToString() + " end";
-        if (gState.currentEnd != 1)
+        userInterface.endsTitle.text = "Score after " + gameState.currentEnd.ToString() + " end";
+        if (gameState.currentEnd != 1)
         {
-            ui.endsTitle.text += "s";
+            userInterface.endsTitle.text += "s";
         }
-        ui.scoreboard.gameObject.SetActive(true);
+        userInterface.scoreboard.gameObject.SetActive(true);
 
         yield return new WaitUntil(() => ready);
     }

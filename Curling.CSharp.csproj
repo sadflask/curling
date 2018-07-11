@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.6.1f1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -88,15 +90,19 @@
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
     <Compile Include="Assets\Scripts\ConfigData.cs" />
     <Compile Include="Assets\Scripts\ConfigUI.cs" />
+    <Compile Include="Assets\Scripts\DummyPooler.cs" />
     <Compile Include="Assets\Scripts\DummySpawner.cs" />
     <Compile Include="Assets\Scripts\DummyStone.cs" />
     <Compile Include="Assets\Scripts\EndSceneTransition.cs" />
+    <Compile Include="Assets\Scripts\Injector.cs" />
     <Compile Include="Assets\Scripts\KeepStraight.cs" />
     <Compile Include="Assets\Scripts\LineSelector.cs" />
     <Compile Include="Assets\Scripts\Logger.cs" />
     <Compile Include="Assets\Scripts\PassNPlayer\PNPGameController.cs" />
+    <Compile Include="Assets\Scripts\PlayerData.cs" />
     <Compile Include="Assets\Scripts\Score.cs" />
     <Compile Include="Assets\Scripts\Singleplayer\Controllers\AI.cs" />
+    <Compile Include="Assets\Scripts\Singleplayer\Controllers\AdvancedAI.cs" />
     <Compile Include="Assets\Scripts\Singleplayer\Controllers\GameController.cs" />
     <Compile Include="Assets\Scripts\Singleplayer\Controllers\GameState.cs" />
     <Compile Include="Assets\Scripts\Singleplayer\Controllers\NormalAI.cs" />
@@ -105,6 +111,11 @@
     <Compile Include="Assets\Scripts\Singleplayer\Controllers\UIController.cs" />
     <Compile Include="Assets\Scripts\Stone.cs" />
     <Compile Include="Assets\Scripts\StonePooler.cs" />
+    <Compile Include="Assets\Scripts\Sweeper.cs" />
+    <Compile Include="Assets\Scripts\Tutorial.cs" />
+    <Compile Include="Assets\Scripts\TutorialSpawner.cs" />
+    <Compile Include="Assets\Scripts\TutorialStone.cs" />
+    <Compile Include="Assets\Scripts\WeightTester.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

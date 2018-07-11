@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using System.Collections;
+using UnityEngine;
 
 public class GameState : MonoBehaviour {
 
@@ -9,9 +9,10 @@ public class GameState : MonoBehaviour {
     
     public int stonesThrown;
 
-    public Stone[] stones = new Stone[16];
+    public ArrayList stones = new ArrayList();
     
     public Stone currentStone = null;
+    public Stone lastThrownStone = null;
 
     public GameObject skipPosition, topPosition, stonePosition;
 
