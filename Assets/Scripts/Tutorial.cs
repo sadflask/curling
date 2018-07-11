@@ -12,6 +12,7 @@ public class Tutorial : MonoBehaviour {
     public Text[] zones;
     public Image highlight;
     public GameObject[] otherHighlights;
+    public GameObject lineObject;
 
     public Canvas weightCanvas, lineCanvas, handleCanvas, scoreCanvas;
 
@@ -38,6 +39,11 @@ public class Tutorial : MonoBehaviour {
                     "The handle is simple, a clockwise turn will cause the stone to curl to it's right, and the other turn will cause it to curl to the left.",
                     "As a general rule, if you put the line to the left, use a clockwise turn and vice-versa." };
     private string demo = "Take a look at how the line and handle affect the stone here.";
+    private string[] sweeping = { "To affect the path of the stone, curlers sweep with brooms",
+                    "Sweeping a stone has two effects.",
+                    "1. The stone will slow down less (travel further).",
+                    "2. The stone will curl less.",
+                    "Sweep by clicking and moving the mouse in front of the stone."};
     private string[] score = { "Now we know how to throw, but how do we score points?",
                     "The scoring of curling is a very simple affair, and is calculated by the number of stones you have closer than all of your opponent's stones",
                     "The easiest way to figure this out is to look at your opponents closest stone. You get one point for each stone closer than that.",

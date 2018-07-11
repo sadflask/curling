@@ -33,3 +33,7 @@ sysinfo.txt
 ehthumbs.db
 [Tt]humbs.db
 [Dd]esktop.ini
+/Builds/Curling_Data
+/Builds/MultiplayerTest_Data
+/Builds
+*.meta

@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-public class Stone : MonoBehaviour {
+public class Stone : MonoBehaviour, IComparable
+{
     public float lastHit;
 
     public int playerIndex;
@@ -24,13 +26,14 @@ public class Stone : MonoBehaviour {
     private float drag;
 
     public Canvas canvas;
-    public GameController gc;
+    public GameController gameController;
 
     private AudioSource[] sources;
 
-	// Use this for initialization
-	void Start () {
-        gc = FindObjectOfType<GameController>();
+    // Use this for initialization
+    void Start()
+    {
+        gameController = FindObjectOfType<GameController>();
         isCurling = true;
         passedHog = false;
         velocity = weight * transform.forward;
@@ -47,10 +50,10 @@ public class Stone : MonoBehaviour {
         else if (other.CompareTag("CameraProc"))
         {
             //Change player position;
-            if (gc.gState.players[playerIndex])
+            if (gameController.gameState.players[playerIndex])
             {
-                gc.gState.players[playerIndex].transform.position = gc.gState.topPosition.transform.position;
-                gc.gState.players[playerIndex].transform.rotation = gc.gState.topPosition.transform.rotation;
+                gameController.gameState.players[playerIndex].transform.position = gameController.gameState.topPosition.transform.position;
+                gameController.gameState.players[playerIndex].transform.rotation = gameController.gameState.topPosition.transform.rotation;
             }
             passedHog = true;
         }
@@ -59,8 +62,10 @@ public class Stone : MonoBehaviour {
             released = true;
         }
     }
-    void OnCollisionEnter(Collision c) {
-        if (c.gameObject.CompareTag("Stone")) {
+    void OnCollisionEnter(Collision c)
+    {
+        if (c.gameObject.CompareTag("Stone"))
+        {
             Stone otherStone = c.gameObject.GetComponent<Stone>();
             //Set angle of self and other
             isCurling = false;
@@ -94,7 +99,7 @@ public class Stone : MonoBehaviour {
                 float hitSize = velocity.magnitude * Mathf.Sin(Mathf.Deg2Rad * theta);
 
                 audioSize = audioSize * hitSize / velocity.magnitude; //Will be between 0 and 1.
-                
+
                 sources[0].volume = audioSize;
                 sources[0].Play();
 
@@ -109,18 +114,19 @@ public class Stone : MonoBehaviour {
             }
         }
     }
-   
+
     // Update is called once per frame
-    void FixedUpdate() {
+    void FixedUpdate()
+    {
         if (isCurling)
         {
             if (!passedHog)
             {
                 //Move camera to stone
-                if (gc.gState.players[playerIndex])
+                if (gameController.gameState.players[playerIndex])
                 {
-                    gc.gState.players[playerIndex].transform.position = new Vector3(0, 1.7f, transform.position.z -2);
-                    gc.gState.players[playerIndex].transform.rotation = gc.gState.stonePosition.transform.rotation;
+                    gameController.gameState.players[playerIndex].transform.position = new Vector3(0, 1.7f, transform.position.z - 2);
+                    gameController.gameState.players[playerIndex].transform.rotation = gameController.gameState.stonePosition.transform.rotation;
                 }
             }
             //Make the stone curl more at lower speeds
@@ -137,7 +143,8 @@ public class Stone : MonoBehaviour {
             {
                 //Subtract the drag from the current velocity.
                 drag = 20 * 0.0168f * Time.deltaTime / 4;
-            } else
+            }
+            else
             {
                 drag = 0;
                 curl = 0;
@@ -162,7 +169,7 @@ public class Stone : MonoBehaviour {
             //Spin the stone
             transform.rotation = Quaternion.Euler(new Vector3(0, transform.rotation.eulerAngles.y + handle, 0));
         }
-        else 
+        else
         {
             float newSpeed;
             drag = 20 * 0.0168f * Time.deltaTime / 4;
@@ -174,23 +181,23 @@ public class Stone : MonoBehaviour {
             {
                 velocity = Vector3.zero;
                 //Determine if the free guard zone is still applicable
-                if (gc.gState.stonesThrown < 4)
+                if (gameController.gameState.stonesThrown < 4)
                 {
                     if (isFreeGuard)
                     {
                         //Check if the stone was removed from play, and if so replace it
                         if (transform.position.x == 5)
                         {
-                            Debug.Log(string.Format("Stones thrown = {0}", gc.gState.stonesThrown));
+                            Debug.Log(string.Format("Stones thrown = {0}", gameController.gameState.stonesThrown));
                             //Remove offending stone
-                            gc.gState.stones[gc.gState.stonesThrown - 1].transform.position = new Vector3(5, -1, 18);
-                            gc.gState.stones[gc.gState.stonesThrown - 1].gameObject.SetActive(false);
+                            gameController.gameState.lastThrownStone.transform.position = new Vector3(5, -1, 18);
+                            gameController.gameState.lastThrownStone.gameObject.SetActive(false);
 
                             //Move stone back into play
                             transform.position = lastPosition;
                         }
                     }
-                    if (IsGuard())
+                    if (IsGuard)
                     {
                         isFreeGuard = true;
                         lastPosition = transform.position;
@@ -204,25 +211,92 @@ public class Stone : MonoBehaviour {
         }
         transform.position = transform.position + velocity * Time.deltaTime;
     }
-    //If the stone is in front of the tee line and outside the house it is in the freeguard zone
-    public bool IsGuard()
+    public bool IsGuard
     {
-        if (!InHouse())
+        //If the stone is in front of the tee line and outside the house it is in the freeguard zone
+        get
         {
-            if (transform.position.z < 17.37)
+            if (!IsInHouse)
+                return (transform.position.z < 17.37);
+            return false;
+        }
+    }
+    public bool IsBehindTee
+    {
+        get
+        {
+            return (transform.position.z > 19);
+        }
+    }
+    public bool IsCentreGuard
+    {
+        get
+        {
+            if (IsGuard)
             {
-                return true;
+                return (Math.Abs(transform.position.x) < 0.5);
+            }
+            return false;
+        }
+    }
+    public bool IsInHouse
+    {
+        get
+        {
+            return (Distance < 1.98);
+        }
+    }
+    public bool IsGuarded
+    {
+        get
+        {
+            foreach (Stone stone in gameController.gameState.stones)
+            {
+                if (stone != null)
+                {
+                    if ((Mathf.Abs(transform.position.x - stone.transform.position.x) < 0.2) &&
+                        (stone.IsGuard))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+    public Stone GetGuard()
+    {
+        if (!IsGuarded) return null;
+        foreach (Stone stone in gameController.gameState.stones)
+        {
+            if (stone!=null)
+            {
+                if ((Mathf.Abs(transform.position.x - stone.transform.position.x) < 0.2) &&
+                        (stone.IsGuard))
+                {
+                    return stone;
+                }
             }
         }
-        return false;
+        return null;
     }
-    public bool InHouse()
+
+    public int CompareTo(object obj)
     {
-        float distance = (transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude;
-        if (distance < 1.98)
+        Stone toCompare = (Stone)obj;
+        if (toCompare.Distance < Distance)
+            return 1;
+        else if (toCompare.Distance == Distance)
+            return 0;
+        else
+            return -1;
+    }
+
+    public float Distance
+    {
+        get
         {
-            return true;
+            return (transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude;
         }
-        return false;
     }
 }

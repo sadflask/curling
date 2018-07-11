@@ -2,27 +2,19 @@
 using System.Collections;
 using System;
 
-public abstract class AI : Player {
-    protected Stone closestP2Stone = null;
-    protected Stone closestP1Stone = null;
-    protected Stone guard = null;
+public abstract class AI : Player
+{
     public int level;
 
-    protected int score;
+    /// <summary>
+    /// The difference between the player scores. A positive value means the AI is winning.
+    /// </summary>
+    protected int pointsUpBy;
 
-    protected enum GameStateEnum
+    public override void LoadData(ConfigData configData)
     {
-        SittingOpen,
-        SittingGuarded,
-        OpponentSittingOpen,
-        OpponentSittingGuarded,
-        EmptyHouseOpen,
-        EmptyHouseGuarded
-    }
-    public override void LoadData(ConfigData cData)
-    {
-        level = cData.aiLevel;
-        base.LoadData(cData);
+        level = configData.aiLevel;
+        base.LoadData(configData);
     }
     protected void CheckAccuracy()
     {
@@ -33,8 +25,8 @@ public abstract class AI : Player {
         int wDir = UnityEngine.Random.Range(0, 100);
         int lDir = UnityEngine.Random.Range(0, 100);
 
-        Debug.Log(string.Format("Weight: {0}",w));
-        Debug.Log(string.Format("Line: {0}",l));
+        Debug.Log(string.Format("Weight: {0}", w));
+        Debug.Log(string.Format("Line: {0}", l));
 
         switch (level)
         {
@@ -77,23 +69,49 @@ public abstract class AI : Player {
 
         }
     }
+    protected bool HasHammer
+    {
+        get
+        {
+            return gameState.stonesThrown % 2 == 1;
+        }
+    }
+    protected bool BeforeLastTwoStones
+    {
+        get
+        {
+            return gameState.stonesThrown < 14;
+        }
+    }
+    protected bool FreeGuardActive
+    {
+        get
+        {
+            return gameState.stonesThrown < 4;
+        }
+    }
+    public bool IsAIStone(Stone stone)
+    {
+        return stone.playerIndex == 1;
+    }
     public abstract override void DecideOnShot();
+
     //Draw to the other side of the house that the guard is on
-    protected void DrawBehind()
+    protected void DrawBehind(Stone guard)
     {
         Draw(1.5f * -1 * Mathf.Sign(guard.transform.position.x));
     }
-    protected void Guard(Stone closestAIStone)
+    protected void Guard(Stone toGuard)
     {
         //#TODO change this
         float line;
-        if (closestAIStone.transform.position.x < 0)
+        if (toGuard.transform.position.x < 0)
         {
-            line = closestAIStone.transform.position.x - 1.0f;
+            line = toGuard.transform.position.x - 1.0f;
         }
         else
         {
-            line = closestAIStone.transform.position.x + 1.0f;
+            line = toGuard.transform.position.x + 1.0f;
         }
 
         Vector3 toThrowAlong = new Vector3(line, 0, (17.375f + 20.75f));
@@ -104,19 +122,15 @@ public abstract class AI : Player {
         weight = (float)Curling.Weight.Two;
         handle = (int)Mathf.Sign(angleBetween) * -1;
     }
-    protected void OpenHit()
+    protected void OpenHit(Stone toHit)
     {
         //Find the stone to hit.
         float line;
-        if (closestP1Stone.transform.position.x < 0)
-        {
-            line = closestP1Stone.transform.position.x - 0.35f;
-        }
+        if (toHit.transform.position.x < 0)
+            line = toHit.transform.position.x - 0.35f;
         else
-        {
-            line = closestP1Stone.transform.position.x + 0.35f;
-        }
-        
+            line = toHit.transform.position.x + 0.35f;
+
         Vector3 toThrowAlong = new Vector3(line, 0, (17.375f + 20.75f));
         Vector3 centreline = new Vector3(0, 0, 1);
         float angleBetween = Vector3.Angle(toThrowAlong, centreline) * Mathf.Sign(line);
@@ -125,32 +139,38 @@ public abstract class AI : Player {
         weight = (float)Curling.Weight.Control;
         handle = (int)Mathf.Sign(angleBetween) * -1;
     }
-    protected void HitAround()
+    protected void DoubleTakeout(Stone stone1, Stone stone2)
+    {
+        throw new NotImplementedException();
+    }
+    protected void HitAround(Stone toHit, Stone guard)
     {
         //Find the stone to hit.
         float line;
-        if (closestP1Stone.transform.position.x < 0)
+        if (toHit.transform.position.x < 0)
         {
             //If the guard is inside the stone hit outside
-            if (guard.transform.position.x > closestP1Stone.transform.position.x)
+            if (guard.transform.position.x > toHit.transform.position.x)
             {
-                line = closestP1Stone.transform.position.x - 0.35f;
+                line = toHit.transform.position.x - 0.35f;
                 handle = 1;
-            } else
+            }
+            else
             {
-                line = closestP1Stone.transform.position.x + 0.35f;
+                line = toHit.transform.position.x + 0.35f;
                 handle = -1;
             }
         }
         else
         {
-            if (guard.transform.position.x < closestP1Stone.transform.position.x)
+            if (guard.transform.position.x < toHit.transform.position.x)
             {
-                line = closestP1Stone.transform.position.x + 0.35f;
-                 handle = -1;
-            } else
+                line = toHit.transform.position.x + 0.35f;
+                handle = -1;
+            }
+            else
             {
-                line = closestP1Stone.transform.position.x - 0.35f;
+                line = toHit.transform.position.x - 0.35f;
                 handle = 1;
             }
         }
@@ -161,74 +181,44 @@ public abstract class AI : Player {
         direction = angleBetween;
         weight = (float)Curling.Weight.Control;
     }
+    protected void Hit(Stone toHit)
+    {
+        if (toHit.IsGuarded) HitAround(toHit, toHit.GetGuard());
+        else OpenHit(toHit);
+    }
     protected void Draw(float dir)
     {
         weight = (float)Curling.Weight.Seven;
         direction = dir;
         handle = -1 * (int)Mathf.Sign(direction);
     }
-    protected void Split()
+    protected void CentreGuard()
+    {
+        weight = (float)Curling.Weight.Two;
+        direction = 1.3f;
+        handle = -1;
+    }
+    protected void LongCentreGuard()
+    {
+        weight = (float)Curling.Weight.One;
+        direction = 1.3f;
+        handle = -1;
+    }
+    protected void CornerGuard(int handle)
+    {
+        weight = (float)Curling.Weight.Two;
+        direction = 0;
+        this.handle = handle;
+    }
+    protected void Split(Stone shot)
     {
         weight = (float)Curling.Weight.Six;
-        direction = 1f * Mathf.Sign(closestP2Stone.transform.position.x);
-        this.handle = -1 * (int)Mathf.Sign(direction);
+        direction = 1f * Mathf.Sign(shot.transform.position.x);
+        handle = -1 * (int)Mathf.Sign(direction);
     }
-    protected GameStateEnum DetermineState()
+    protected void DrawOnto(Stone shot)
     {
-        float closestP2StoneDistance = gc.sc.FindClosestSecondPlayerStone(gc.gState.stones, out closestP2Stone);
-        float closestP1StoneDistance = gc.sc.FindClosestFirstPlayerStone(gc.gState.stones, out closestP1Stone);
-        if (closestP2StoneDistance > 1.98 && closestP1StoneDistance > 1.98)
-        {
-            foreach (Stone s in gc.gState.stones)
-            {
-                if (s != null)
-                {
-                    if (s.IsGuard())
-                    {
-                        guard = s;
-                        return GameStateEnum.EmptyHouseGuarded;
-                    }
-                }
-            }
-            return GameStateEnum.EmptyHouseOpen;
-        } else if (closestP1StoneDistance < closestP2StoneDistance) 
-        {
-            if (IsGuarded(closestP1Stone, out guard))
-            {
-                return GameStateEnum.OpponentSittingGuarded;
-            } else
-            {
-                return GameStateEnum.OpponentSittingOpen;
-            }
-        } else if (closestP1StoneDistance >= closestP2StoneDistance)
-        {
-            if (IsGuarded(closestP2Stone, out guard))
-            {
-                return GameStateEnum.SittingGuarded;
-            } else
-            {
-                return GameStateEnum.SittingOpen;
-            }
-        } else
-        {
-            return GameStateEnum.EmptyHouseOpen;
-        }
+        throw new NotImplementedException();
     }
-    bool IsGuarded(Stone toGuard, out Stone guard)
-    {
-        foreach(Stone s in gc.gState.stones)
-        {
-            if (s != null)
-            {
-                if ((Mathf.Abs(toGuard.transform.position.x - s.transform.position.x) < 0.2) &&
-                    (toGuard.transform.position.z > s.transform.position.z))
-                {
-                    guard = s;
-                    return true;
-                }
-            }
-        }
-        guard = null;
-        return false;
-    }
+    
 }

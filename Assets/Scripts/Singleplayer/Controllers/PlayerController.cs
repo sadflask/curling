@@ -9,8 +9,8 @@ public class PlayerController : Player {
     public override void DecideOnShot()
     {
         //Change player's position to be looking down at house
-        transform.position = gc.gState.topPosition.transform.position;
-        transform.rotation = gc.gState.topPosition.transform.rotation;
+        transform.position = gameController.gameState.topPosition.transform.position;
+        transform.rotation = gameController.gameState.topPosition.transform.rotation;
         ui.SetCanvasCamera(ui.weightCanvas, cam);
         ui.weightCanvas.gameObject.SetActive(true);
     }

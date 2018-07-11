@@ -6,11 +6,10 @@ public class NormalAI : AI {
 
     public override void DecideOnShot()
     {
-       GameStateEnum gse = DetermineState();
 
-        int score = (int.Parse(gc.ui.firstPlayerTotal.text) - int.Parse(gc.ui.secondPlayerTotal.text));
+        int score = (int.Parse(gameController.userInterface.firstPlayerTotal.text) - int.Parse(gameController.userInterface.secondPlayerTotal.text));
         //If the stone is the first stone
-        if ( gs.stonesThrown == 0)
+        if ( gameState.stonesThrown == 0)
         {
             //If less than 2 up throw a guard
             if (score < 2)
@@ -35,7 +34,7 @@ public class NormalAI : AI {
         }
         else
         {
-            switch (gse)
+            /*switch (gse)
             {
                 case GameStateEnum.EmptyHouseOpen:
                     Draw(1.3f);
@@ -48,7 +47,7 @@ public class NormalAI : AI {
                     break;
                 case GameStateEnum.OpponentSittingGuarded:
                     //if the opponent's stone is well guarded and you do not have hammer, try drawing instead of hitting
-                    if (Mathf.Abs(guard.transform.position.x - closestP1Stone.transform.position.x) < 0.2 && gs.stonesThrown % 2 == 0)
+                    if (Mathf.Abs(guard.transform.position.x - closestP1Stone.transform.position.x) < 0.2 && gameState.stonesThrown % 2 == 0)
                     {
                         DrawBehind();
                     }
@@ -60,7 +59,7 @@ public class NormalAI : AI {
                     break;
                 case GameStateEnum.SittingOpen:
                     //Guard the ai's stone if trying to steal
-                    if (gs.stonesThrown % 2 == 0)
+                    if (gameState.stonesThrown % 2 == 0)
                     {
                         Guard(closestP2Stone);
                     }
@@ -76,11 +75,12 @@ public class NormalAI : AI {
                 default:
                     Draw(1.3f);
                     break;
-            }
+            }*/
+            Draw(1.3f);
         }
         CheckAccuracy();
-        gc.ui.SetHandle(handle);
-        gc.ui.SetWeight(weight.ToString());
+        gameController.userInterface.SetHandle(handle);
+        gameController.userInterface.SetWeight(weight.ToString());
         Throw();
     }
 }

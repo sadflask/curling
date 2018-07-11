@@ -1,128 +1,135 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Score {
+public class ScoreHelper {
     //Calculate the number of points scored
     public int firstPlayerScore;
     public int secondPlayerScore;
 
-    GameController gController;
+    GameController gameController;
 
-    public int CalculateScore(GameController gc)
+    public int CalculateScore(GameController gameController)
     {
-        gController = gc;
-        GameState gState = gController.gState;
-        Score sc = gController.sc;
-        UIController ui = gController.ui;
+        this.gameController = gameController;
+        GameState gameState = this.gameController.gameState;
+        ScoreHelper scoreHelper = this.gameController.scoreHelper;
+        UIController userInterface = this.gameController.userInterface;
 
         int score = 0;
-        Stone closestFirstPlayerStone, closestSecondPlayerStone;
-        float minSecondPlayerDistance = sc.FindClosestSecondPlayerStone(gState.stones, out closestSecondPlayerStone);
-        float minFirstPlayerDistance = sc.FindClosestFirstPlayerStone(gState.stones, out closestFirstPlayerStone);
+        Stone closestFirstPlayerStone = scoreHelper.FindClosestFirstPlayerStone(gameState.stones);
+        Stone closestSecondPlayerStone = scoreHelper.FindClosestSecondPlayerStone(gameState.stones);
+        float minFirstPlayerDistance = closestFirstPlayerStone.Distance;
+        float minSecondPlayerDistance = closestSecondPlayerStone.Distance;
         if (minSecondPlayerDistance < minFirstPlayerDistance)
         {
             if (minSecondPlayerDistance > 1.98)
             {
                 score = 0;
-                ui.secondPlayerScores[gState.currentEnd-1].text = "0";
+                userInterface.secondPlayerScores[gameState.currentEnd-1].text = "0";
             }
             else
             {
                 //Give the second player hammer
-                gState.throwingPlayerIndex = 1;
-                score = sc.GetScoreValue(minFirstPlayerDistance, gState.stones);
-                string[] scores = ui.scoreText.text.Split(null);
+                gameState.throwingPlayerIndex = 1;
+                score = scoreHelper.GetScoreValue(minFirstPlayerDistance, gameState.stones);
+                string[] scores = userInterface.scoreText.text.Split(null);
                 int currentSecondPlayerScore = int.Parse(scores[2]) + score;
-                ui.scoreText.text = scores[0] + " - " + currentSecondPlayerScore.ToString();
-                ui.secondPlayerTotal.text = currentSecondPlayerScore.ToString();
-                ui.secondPlayerScores[gState.currentEnd-1].text = score.ToString();
+                userInterface.scoreText.text = scores[0] + " - " + currentSecondPlayerScore.ToString();
+                userInterface.secondPlayerTotal.text = currentSecondPlayerScore.ToString();
+                userInterface.secondPlayerScores[gameState.currentEnd-1].text = score.ToString();
                 secondPlayerScore = currentSecondPlayerScore;
             }
-            ui.firstPlayerScores[gState.currentEnd-1].text = "0";
+            userInterface.firstPlayerScores[gameState.currentEnd-1].text = "0";
         }
         else
         {
             if (minFirstPlayerDistance > 1.98)
             {
                 score = 0;
-                ui.firstPlayerScores[gState.currentEnd-1].text = "0";
+                userInterface.firstPlayerScores[gameState.currentEnd-1].text = "0";
             }
             else
             {
                 //Give the first player hammer
-                gState.throwingPlayerIndex = 0;
-                score = sc.GetScoreValue(minSecondPlayerDistance, gState.stones);
-                string[] scores = ui.scoreText.text.Split(null);
+                gameState.throwingPlayerIndex = 0;
+                score = scoreHelper.GetScoreValue(minSecondPlayerDistance, gameState.stones);
+                string[] scores = userInterface.scoreText.text.Split(null);
                 int currentFirstPlayerScore = int.Parse(scores[0]) + score;
-                ui.scoreText.text = currentFirstPlayerScore.ToString() + " - " + scores[2];
-                ui.firstPlayerTotal.text = currentFirstPlayerScore.ToString();
-                ui.firstPlayerScores[gState.currentEnd-1].text = score.ToString();
+                userInterface.scoreText.text = currentFirstPlayerScore.ToString() + " - " + scores[2];
+                userInterface.firstPlayerTotal.text = currentFirstPlayerScore.ToString();
+                userInterface.firstPlayerScores[gameState.currentEnd-1].text = score.ToString();
                 firstPlayerScore = currentFirstPlayerScore;
             }
-            ui.secondPlayerScores[gState.currentEnd-1].text = "0";
+            userInterface.secondPlayerScores[gameState.currentEnd-1].text = "0";
         }
         return score;
     }
-    //Iterate through stone array to find closest secondplayer stone
-    public float FindClosestSecondPlayerStone(Stone[] stones, out Stone closestSecondPlayerStone)
+    //Iterate through stone raray to find closest secondplayer stone
+    public Stone FindClosestSecondPlayerStone(ArrayList sortedStones)
     {
-        float min = 200;
-        closestSecondPlayerStone = null;
-        foreach (Stone s in stones)
+        for (int i = 0; i < sortedStones.Count; i++)
         {
-            if (s!=null) {
-                if (s.playerIndex == 1)
-                {
-                    float distance = (s.transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude;
-                    if (distance < min)
-                    {
-                        min = distance;
-                        closestSecondPlayerStone = s;
-                    }
-                }
-            }
-        }
-        return min;
-    }
-    //Iterate through stone array to find closest player stone
-    public float FindClosestFirstPlayerStone(Stone[] stones, out Stone closestPlayerStone)
-    {
-        float min = 200;
-        closestPlayerStone = null;
-        foreach (Stone s in stones)
-        {
-            if (s != null)
+            Stone currentStone = (Stone)sortedStones[i];
+            if (currentStone != null)
             {
-                if (s.playerIndex == 0)
+                if (currentStone.playerIndex == 1)
                 {
-                    float distance = (s.transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude;
-                    if (distance < min)
-                    {
-                        min = distance;
-                        closestPlayerStone = s;
-                    }
+                    return currentStone;
                 }
             }
         }
-        return min;
+        return null;
+    }
+     
+    //Iterate through stone array to find closest player stone
+    public Stone FindClosestFirstPlayerStone(ArrayList sortedStones)
+    {
+        for (int i=0;i<sortedStones.Count;i++)
+        {
+            Stone currentStone = (Stone)sortedStones[i];
+            if (currentStone != null)
+            {
+                if (currentStone.playerIndex == 0)
+                {
+                    return currentStone;
+                }
+            }
+        }
+        return null;
     }
     //This function finds the number of stones closer than that of the other team
-    int GetScoreValue(float minDist, Stone[] stones)
+    int GetScoreValue(float minOtherTeamDistance, ArrayList stones)
     {
         int score = 0;
-        foreach (Stone s in stones)
+        foreach (Stone stone in stones)
         { 
-            float distance = (s.transform.position - new Vector3(0, 0.3f, 17.37f)).magnitude;
-            
-            if (distance < minDist && distance < 1.98)
+          
+            if (stone.Distance < minOtherTeamDistance && stone.Distance < 1.98)
             {
                 score++;
-                Debug.Log(string.Format("Stone is at: {0}", s.transform.position));
-                Debug.Log(string.Format("Distance = {0}, Min Distance = {1}", distance, minDist));
+                Debug.Log(string.Format("Stone is at: {0}", stone.transform.position));
+                Debug.Log(string.Format("Distance = {0}, Min Distance = {1}", stone.Distance, minOtherTeamDistance));
             }
 
         }
         Debug.Log(score);
         return score;
+    }
+    bool IsGuarded(Stone toGuard, out Stone guard)
+    {
+        foreach (Stone stone in gameController.gameState.stones)
+        {
+            if (stone != null)
+            {
+                if ((Mathf.Abs(toGuard.transform.position.x - stone.transform.position.x) < 0.2) &&
+                    (toGuard.transform.position.z > stone.transform.position.z))
+                {
+                    guard = stone;
+                    return true;
+                }
+            }
+        }
+        guard = null;
+        return false;
     }
 }
